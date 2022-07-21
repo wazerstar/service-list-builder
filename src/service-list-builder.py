@@ -198,7 +198,7 @@ def main() -> int:
         for line in es_lines:
             enable_script.write(f"{line}\n")
         
-    print("done")
+    print("info: done")
 
     return 0
 

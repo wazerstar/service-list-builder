@@ -12,14 +12,14 @@ SERVICES_HIVE = "SYSTEM\\CurrentControlSet\\Services"
 
 
 def parse_config(section: str, array_name: list, cfg: ConfigParser) -> None:
-    """Parses the configuration file for this program"""
+    """parses the configuration file for this program"""
     for i in cfg[section]:
         if i != "" and i not in array_name:
             array_name.append(i)
 
 
 def append_filter(filter_name: str, filter_type: str, arr_name: list) -> str:
-    """Prepares a list in the REG_MULTI_SZ format"""
+    """prepares a list in the reg_mul_sz format"""
     key_data = []
     with winreg.OpenKey(
         winreg.HKEY_LOCAL_MACHINE,
@@ -35,7 +35,7 @@ def append_filter(filter_name: str, filter_type: str, arr_name: list) -> str:
 
 
 def split_lines(arr_name: list) -> str:
-    """Prepares a list in the REG_MULTI_SZ format"""
+    """rrepares a list in the reg_multi_sz format"""
     string = ""
     for i in arr_name:
         string += i
@@ -45,7 +45,7 @@ def split_lines(arr_name: list) -> str:
 
 
 def read_value(path: str, value_name: str) -> list | None:
-    """Read keys in Windows Registry"""
+    """read keys in windows registry"""
     try:
         with winreg.OpenKey(
             winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY
@@ -59,7 +59,7 @@ def read_value(path: str, value_name: str) -> list | None:
 
 
 def main() -> int:
-    """CLI Entrypoint"""
+    """cli entrypoint"""
 
     version = "0.3.2"
 
@@ -121,21 +121,21 @@ def main() -> int:
             os.remove(script)
 
     filter_dict = {
-        '{4d36e967-e325-11ce-bfc1-08002be10318}': {
-            'LowerFilters': ['EhStorClass']
+        "{4d36e967-e325-11ce-bfc1-08002be10318}": {
+            "LowerFilters": ["EhStorClass"]
         },
-        '{71a27cdd-812a-11d0-bec7-08002be2092f}': {
-            'LowerFilters': ['fvevol', 'iorate', 'rdyboost'],
-            'UpperFilters': ['volsnap']
+        "{71a27cdd-812a-11d0-bec7-08002be2092f}": {
+            "LowerFilters": ["fvevol", "iorate", "rdyboost"],
+            "UpperFilters": ["volsnap"]
         },
-        '{4d36e96c-e325-11ce-bfc1-08002be10318}': {
-            'UpperFilters': ['ksthunk']
+        "{4d36e96c-e325-11ce-bfc1-08002be10318}": {
+            "UpperFilters": ["ksthunk"]
         },
-        '{6bdd1fc6-810f-11d0-bec7-08002be2092f}': {
-            'UpperFilters': ['ksthunk']
+        "{6bdd1fc6-810f-11d0-bec7-08002be2092f}": {
+            "UpperFilters": ["ksthunk"]
         },
-        '{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}': {
-            'UpperFilters': ['ksthunk']
+        "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}": {
+            "UpperFilters": ["ksthunk"]
         }
     }
 
@@ -197,7 +197,7 @@ def main() -> int:
     with open("build\\Services-Enable.bat", "a", encoding="UTF-8") as enable_script:
         for line in es_lines:
             enable_script.write(f"{line}\n")
-        
+
     print("info: done")
 
     return 0

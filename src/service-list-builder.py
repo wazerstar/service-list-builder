@@ -4,6 +4,7 @@ import os
 import sys
 from configparser import ConfigParser
 import argparse
+import ctypes
 import win32con
 import win32service
 
@@ -58,8 +59,17 @@ def read_value(path: str, value_name: str) -> list | None:
         return None
 
 
+def is_admin() -> bool:
+    """check if script is ran with admin privileges"""
+    return ctypes.windll.shell32.IsUserAnAdmin() != 0
+
+
 def main() -> int:
     """cli entrypoint"""
+
+    if not is_admin():
+        print("error: administrator privileges required")
+        return 1
 
     version = "0.3.2"
 

@@ -36,7 +36,7 @@ def append_filter(filter_name: str, filter_type: str, arr_name: list) -> str:
 
 
 def split_lines(arr_name: list) -> str:
-    """rrepares a list in the reg_multi_sz format"""
+    """prepares a list in the reg_multi_sz format"""
     string = ""
     for i in arr_name:
         string += i

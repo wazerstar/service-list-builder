@@ -71,7 +71,7 @@ def main() -> int:
         print("error: administrator privileges required")
         return 1
 
-    version = "0.3.2"
+    version = "0.3.3"
 
     parser = argparse.ArgumentParser(description=f"service-list-builder v{version}")
 

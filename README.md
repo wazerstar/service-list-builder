@@ -17,10 +17,9 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
 
 - Additionally you can include full folder paths or binaries (without quotes) to get renamed to _old under the ``[Toggle_Files_Folders]``.
 
-  ```
-  Note: 
-  
-  - All lists are case sensitive
+- Additional notes:
+
+  - All entries are case sensitive
 
   - This tool automatically handles driver filters for  the following:
   
@@ -31,7 +30,6 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
     - ksthunk
     - volsnap
 
-  ```
 - Pass lists.ini as an argument to the program through the command-line with the command below to build the scripts.
 
   ```bat

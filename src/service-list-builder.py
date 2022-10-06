@@ -1,3 +1,6 @@
+"""service-list-builder"""
+
+
 from __future__ import annotations
 import winreg
 import os
@@ -8,8 +11,9 @@ import ctypes
 import win32con
 import win32service
 
-CLASS_HIVE = "SYSTEM\\CurrentControlSet\\Control\\Class"
-SERVICES_HIVE = "SYSTEM\\CurrentControlSet\\Services"
+
+class_hive = "SYSTEM\\CurrentControlSet\\Control\\Class"
+services_hive = "SYSTEM\\CurrentControlSet\\Services"
 
 
 def parse_config(section: str, array_name: list, cfg: ConfigParser) -> None:
@@ -22,12 +26,7 @@ def parse_config(section: str, array_name: list, cfg: ConfigParser) -> None:
 def append_filter(filter_name: str, filter_type: str, arr_name: list) -> str:
     """prepares a list in the reg_mul_sz format"""
     key_data = []
-    with winreg.OpenKey(
-        winreg.HKEY_LOCAL_MACHINE,
-        f"{CLASS_HIVE}\\{filter_name}",
-        0,
-        winreg.KEY_READ | winreg.KEY_WOW64_64KEY,
-    ) as key:
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{class_hive}\\{filter_name}", 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
         key_data = winreg.QueryValueEx(key, filter_type)[0]
         for i in arr_name:
             if i in key_data:
@@ -48,9 +47,7 @@ def split_lines(arr_name: list) -> str:
 def read_value(path: str, value_name: str) -> list | None:
     """read keys in windows registry"""
     try:
-        with winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY
-        ) as key:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
             try:
                 return winreg.QueryValueEx(key, value_name)[0]
             except FileNotFoundError:
@@ -59,39 +56,26 @@ def read_value(path: str, value_name: str) -> list | None:
         return None
 
 
-def is_admin() -> bool:
-    """check if script is ran with admin privileges"""
-    return ctypes.windll.shell32.IsUserAnAdmin() != 0
-
-
 def main() -> int:
     """cli entrypoint"""
 
-    if not is_admin():
+    version = "0.3.3"
+
+    print(f"win-wallpaper v{version}")
+    print("GitHub - https://github.com/amitxv\n")
+
+    if not ctypes.windll.shell32.IsUserAnAdmin():
         print("error: administrator privileges required")
         return 1
 
-    version = "0.3.3"
+    if getattr(sys, "frozen", False):
+        os.chdir(os.path.dirname(sys.executable))
+    elif __file__:
+        os.chdir(os.path.dirname(__file__))
 
     parser = argparse.ArgumentParser(description=f"service-list-builder v{version}")
-
-    parser.add_argument(
-        "--config",
-        metavar="<config>",
-        type=str,
-        help="path to lists config file",
-        required=True
-    )
-
+    parser.add_argument("--config", metavar="<config>", type=str, help="path to lists config file", required=True)
     args = parser.parse_args()
-
-    # change directory to location of program
-    program_path = ""
-    if getattr(sys, "frozen", False):
-        program_path = os.path.dirname(sys.executable)
-    elif __file__:
-        program_path = os.path.dirname(__file__)
-    os.chdir(program_path)
 
     if not os.path.exists(args.config):
         print("error: config file not found")
@@ -112,9 +96,7 @@ def main() -> int:
     parse_config("Drivers_To_Disable", service_dump, config)
     parse_config("Toggle_Files_Folders", rename_folders_executables, config)
 
-    statuses = win32service.EnumServicesStatus(
-        win32service.OpenSCManager(None, None, win32con.GENERIC_READ)  # type: ignore
-    )
+    statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))  # type: ignore
 
     if len(automatic) > 0 or len(manual) > 0:
         for (service_name, _desc, _status) in statuses:
@@ -166,22 +148,22 @@ def main() -> int:
 
     for filter_name in filter_dict:
         for filter_type in filter_dict[filter_name]:
-            if read_value(f"{CLASS_HIVE}\\{filter_name}", filter_type) is not None:
+            if read_value(f"{class_hive}\\{filter_name}", filter_type) is not None:
                 for driver in filter_dict[filter_name][filter_type]:
                     if driver in service_dump:
                         ds_value = append_filter(filter_name, filter_type, service_dump)
                         ds_lines.append(
-                            f'Reg.exe add "HKLM\\{CLASS_HIVE}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ds_value}" /f'
+                            f'Reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ds_value}" /f'
                         )
-                        es_value = split_lines(read_value(f"{CLASS_HIVE}\\{filter_name}", filter_type))  # type: ignore
+                        es_value = split_lines(read_value(f"{class_hive}\\{filter_name}", filter_type))  # type: ignore
                         es_lines.append(
-                            f'Reg.exe add "HKLM\\{CLASS_HIVE}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{es_value}" /f'
+                            f'Reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{es_value}" /f'
                         )
                         break
 
     ds_start_value = 0
     for item in service_dump:
-        if read_value(f"{SERVICES_HIVE}\\{item}", "Start") is not None:
+        if read_value(f"{services_hive}\\{item}", "Start") is not None:
             if item in automatic:
                 ds_start_value = 2
             elif item in manual:
@@ -189,12 +171,12 @@ def main() -> int:
             else:
                 ds_start_value = 4
             ds_lines.append(
-                f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f'
+                f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f'
             )
 
-            es_start_value = str(read_value(f"{SERVICES_HIVE}\\{item}", "Start"))
+            es_start_value = str(read_value(f"{services_hive}\\{item}", "Start"))
             es_lines.append(
-                f'Reg.exe add "HKLM\\{SERVICES_HIVE}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f'
+                f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f'
             )
 
     ds_lines.append("shutdown /r /f /t 0")

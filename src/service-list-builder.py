@@ -73,7 +73,7 @@ def main() -> int:
     elif __file__:
         os.chdir(os.path.dirname(__file__))
 
-    parser = argparse.ArgumentParser(description=f"service-list-builder v{version}")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--config", metavar="<config>", type=str, help="path to lists config file", required=True)
     args = parser.parse_args()
 

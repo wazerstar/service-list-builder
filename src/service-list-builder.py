@@ -59,7 +59,7 @@ def read_value(path: str, value_name: str) -> list | None:
 def main() -> int:
     """cli entrypoint"""
 
-    version = "0.3.3"
+    version = "0.3.4"
 
     print(f"win-wallpaper v{version}")
     print("GitHub - https://github.com/amitxv\n")

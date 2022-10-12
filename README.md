@@ -1,6 +1,6 @@
 ## Service-List-Builder
 
-Build scripts to toggle between minimal & default services in Windows based on user defined lists.
+Build scripts to toggle between minimal and default services in Windows based on user defined lists.
 
 Contact: https://twitter.com/amitxv
 

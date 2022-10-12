@@ -4,7 +4,7 @@ Build scripts to toggle between minimal and default services in Windows based on
 
 Contact: https://twitter.com/amitxv
 
-I am not responsible for damage caused to computer. This tool is powerful & for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. It is also recommended that you use this tool before installing any programs as any other services not defined in the lists will be disabled (e.g services installed by anticheats, or you could simply enable them after building the scripts but the first method is recommended).
+I am not responsible for damage caused to computer. This tool is powerful and for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. It is also recommended that you use this tool before installing any programs as any other services not defined in the lists will be disabled (e.g services installed by anticheats, or you could simply enable them after building the scripts but the first method is recommended).
 
 ## Usage
 - Download the latest release from the [releases tab](https://github.com/amitxv/Service-List-Builder/releases)
@@ -36,7 +36,7 @@ I am not responsible for damage caused to computer. This tool is powerful & for 
   service-list-builder --config "lists.ini"
   ```
 
-- The scripts will be built in the **build** folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with with **Enable All Privileges** checkbox enabled to prevent errors when writing to registry & renaming files
+- The scripts will be built in the **build** folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with with **Enable All Privileges** checkbox enabled to prevent errors when writing to registry and renaming files
 
 ## Example
 

@@ -59,9 +59,9 @@ def read_value(path: str, value_name: str) -> list | None:
 def main() -> int:
     """cli entrypoint"""
 
-    version = "0.3.4"
+    version = "0.3.5"
 
-    print(f"win-wallpaper v{version}")
+    print(f"service-list-builder v{version}")
     print("GitHub - https://github.com/amitxv\n")
 
     if not ctypes.windll.shell32.IsUserAnAdmin():

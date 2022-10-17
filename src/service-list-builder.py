@@ -57,7 +57,7 @@ def read_value(path: str, value_name: str) -> list | None:
 
 
 def main() -> int:
-    """cli entrypoint"""
+    """program entrypoint"""
 
     version = "0.3.5"
 

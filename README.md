@@ -6,31 +6,21 @@ Contact: https://twitter.com/amitxv
 
 I am not responsible for damage caused to computer. This tool is powerful and for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. It is also recommended that you use this tool before installing any programs as any other services not defined in the lists will be disabled (e.g services installed by anticheats, or you could simply enable them after building the scripts but the first method is recommended).
 
-## Usage
+## Usage and Program Logic
+
 - Download the latest release from the [releases tab](https://github.com/amitxv/Service-List-Builder/releases)
 
 - Open **lists.ini** in a text editor
 
-- You can import your service list separated by new lines under the **[Automatic_Services]** and **[Manual_Services]** sections. Whatever services you do not specify under these fields will get disabled
+    - Note: All entries are case sensitive
 
-- Additionally you can also import a list of drivers to be disabled separated by new lines under the **[Drivers_To_Disable]** section. The "disable all except" logic does not apply here in contrast to the previous two sections
+    - Every user mode service **NOT** specified in the **[Automatic_Services]** and **[Manual_Services]** sections will get disabled. These two sections act as whitelist of user mode services **NOT** to disable.
 
-- Additionally you can include full folder paths or binaries (without quotes) to get renamed, so that they do not run, under the **[Toggle_Files_Folders]** section
+    - Kernel mode services to disable can be explicitly specified in the **[Drivers_To_Disable]** section. This section does not follow the "disable all except" logic. Only the kernel mode services specified in this section will get disabled
 
-- Additional notes:
+    - Paths to folders or binaries can be specified in the **[Toggle_Files_Folders]** section. The logic behind this is that when a binary gets renamed to anything other than its original file name, it will not run
 
-  - All entries are case sensitive
-
-  - This tool automatically handles driver filters for the following
-  
-    - EhStorClass
-    - fvevol
-    - iorate
-    - rdyboost
-    - ksthunk
-    - volsnap
-
-- Pass lists.ini as an argument to the program through the command-line with the command below to build the scripts
+- Pass **lists.ini** as an argument to the program through the command-line with the command below to build the scripts
 
   ```bat
   service-list-builder --config "lists.ini"

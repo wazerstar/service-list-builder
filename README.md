@@ -18,7 +18,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
     - Kernel mode services to disable can be explicitly specified in the **[Drivers_To_Disable]** section. This section does not follow the "disable all except" logic. Only the kernel mode services specified in this section will get disabled
 
-    - Paths to folders or binaries can be specified in the **[Toggle_Files_Folders]** section. The logic behind this is that when a binary gets renamed to anything other than its original file name, it will not run
+    - Paths to folders or binaries can be specified in the **[Toggle_Files_Folders]** section. The logic behind this is that when a binary gets renamed to anything other than its original file name, it will not run. Avoid folders and binaries with ``#`` in the name due to conflict with inline comments
 
 - Pass **lists.ini** as an argument to the program through the command-line with the command below to build the scripts
 

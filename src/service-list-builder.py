@@ -81,7 +81,7 @@ def main() -> int:
         print("error: config file not found")
         return 1
 
-    config = ConfigParser(allow_no_value=True, delimiters=("="))
+    config = ConfigParser(allow_no_value=True, delimiters=("="), inline_comment_prefixes="#")
     # prevent lists imported as lowercase
     config.optionxform = str  # type: ignore
     config.read(args.config)

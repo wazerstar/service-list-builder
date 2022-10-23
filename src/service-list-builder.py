@@ -59,7 +59,7 @@ def read_value(path: str, value_name: str) -> list | None:
 def main() -> int:
     """program entrypoint"""
 
-    version = "0.3.5"
+    version = "0.3.6"
 
     print(f"service-list-builder v{version}")
     print("GitHub - https://github.com/amitxv\n")

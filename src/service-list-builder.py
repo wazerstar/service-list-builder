@@ -1,6 +1,3 @@
-"""service-list-builder"""
-
-
 from __future__ import annotations
 import winreg
 import os
@@ -11,19 +8,16 @@ import ctypes
 import win32con
 import win32service
 
-
 class_hive = "SYSTEM\\CurrentControlSet\\Control\\Class"
 services_hive = "SYSTEM\\CurrentControlSet\\Services"
 
-
-def parse_config(section: str, array_name: list, cfg: ConfigParser) -> None:
+def parse_config(section, array_name, cfg) -> None:
     """parses the configuration file for this program"""
     for i in cfg[section]:
         if i != "" and i not in array_name:
             array_name.append(i)
 
-
-def append_filter(filter_name: str, filter_type: str, arr_name: list) -> str:
+def append_filter(filter_name, filter_type, arr_name) -> str:
     """prepares a list in the reg_mul_sz format"""
     key_data = []
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{class_hive}\\{filter_name}", 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
@@ -33,8 +27,7 @@ def append_filter(filter_name: str, filter_type: str, arr_name: list) -> str:
                 key_data.remove(i)
     return split_lines(key_data)
 
-
-def split_lines(arr_name: list) -> str:
+def split_lines(arr_name) -> str:
     """prepares a list in the reg_multi_sz format"""
     string = ""
     for i in arr_name:
@@ -43,8 +36,7 @@ def split_lines(arr_name: list) -> str:
             string += "\\0"
     return string
 
-
-def read_value(path: str, value_name: str) -> list | None:
+def read_value(path, value_name) -> list | None:
     """read keys in windows registry"""
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
@@ -54,7 +46,6 @@ def read_value(path: str, value_name: str) -> list | None:
                 return None
     except FileNotFoundError:
         return None
-
 
 def main() -> int:
     """program entrypoint"""
@@ -185,7 +176,6 @@ def main() -> int:
     print("info: done")
 
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

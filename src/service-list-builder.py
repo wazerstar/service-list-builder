@@ -143,9 +143,9 @@ def main() -> int:
                 for driver in filter_dict[filter_name][filter_type]:
                     if driver in service_dump:
                         ds_value = append_filter(filter_name, filter_type, service_dump)
-                        ds_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ds_value}" /f')
+                        ds_lines.append(f'reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ds_value}" /f')
                         es_value = split_lines(read_value(f"{class_hive}\\{filter_name}", filter_type))  # type: ignore
-                        es_lines.append(f'Reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{es_value}" /f')
+                        es_lines.append(f'reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{es_value}" /f')
                         break
 
     ds_start_value = 0

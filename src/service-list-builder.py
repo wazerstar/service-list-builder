@@ -28,7 +28,7 @@ def append_filter(filter_name, filter_type, arr_name) -> str:
     return split_lines(key_data)
 
 def split_lines(arr_name) -> str:
-    """prepares a list in the reg_multi_sz format"""
+    """prepares a list in the reg_multi_sz format with null characters"""
     string = ""
     for i in arr_name:
         string += i

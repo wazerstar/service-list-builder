@@ -1,6 +1,6 @@
 # Service-List-Builder
 
-Build scripts to toggle between minimal and default services in Windows based on user-defined lists
+Create batch scripts to seamlessly toggle between minimal and default services in Windows based on user-defined lists
 
 I am not responsible for damage caused to computer. This tool is powerful and for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. It is also recommended that you use this tool before installing any programs as any other services not defined in the lists will be disabled (e.g services installed by anticheats, or you could simply enable them after building the scripts but the first method is recommended).
 

@@ -1,4 +1,4 @@
-# Service-List-Builder
+# service-list-builder
 
 Create batch scripts to seamlessly toggle between minimal and default services in Windows based on user-defined lists
 
@@ -6,7 +6,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 ## Usage and Program Logic
 
-- Download the latest release from the [releases tab](https://github.com/amitxv/Service-List-Builder/releases)
+- Download the latest release from the [releases tab](https://github.com/amitxv/service-list-builder/releases)
 
 - Open **lists.ini** in a text editor
 

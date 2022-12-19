@@ -11,21 +11,29 @@ import win32service
 class_hive = "SYSTEM\\CurrentControlSet\\Control\\Class"
 services_hive = "SYSTEM\\CurrentControlSet\\Services"
 
+
 def parse_config(section, array_name, cfg) -> None:
     """parses the configuration file for this program"""
     for i in cfg[section]:
         if i != "" and i not in array_name:
             array_name.append(i)
 
+
 def append_filter(filter_name, filter_type, arr_name) -> str:
     """prepares a list in the reg_mul_sz format"""
     key_data = []
-    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{class_hive}\\{filter_name}", 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+    with winreg.OpenKey(
+        winreg.HKEY_LOCAL_MACHINE,
+        f"{class_hive}\\{filter_name}",
+        0,
+        winreg.KEY_READ | winreg.KEY_WOW64_64KEY,
+    ) as key:
         key_data = winreg.QueryValueEx(key, filter_type)[0]
         for i in arr_name:
             if i in key_data:
                 key_data.remove(i)
     return split_lines(key_data)
+
 
 def split_lines(arr_name) -> str:
     """prepares a list in the reg_multi_sz format with null characters"""
@@ -36,16 +44,20 @@ def split_lines(arr_name) -> str:
             string += "\\0"
     return string
 
+
 def read_value(path, value_name) -> list | None:
     """read keys in windows registry"""
     try:
-        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+        with winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY
+        ) as key:
             try:
                 return winreg.QueryValueEx(key, value_name)[0]
             except FileNotFoundError:
                 return None
     except FileNotFoundError:
         return None
+
 
 def main() -> int:
     """program entrypoint"""
@@ -65,14 +77,22 @@ def main() -> int:
         os.chdir(os.path.dirname(__file__))
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", metavar="<config>", type=str, help="path to lists config file", required=True)
+    parser.add_argument(
+        "--config",
+        metavar="<config>",
+        type=str,
+        help="path to lists config file",
+        required=True,
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.config):
         print("error: config file not found")
         return 1
 
-    config = ConfigParser(allow_no_value=True, delimiters=("="), inline_comment_prefixes="#")
+    config = ConfigParser(
+        allow_no_value=True, delimiters=("="), inline_comment_prefixes="#"
+    )
     # prevent lists imported as lowercase
     config.optionxform = str  # type: ignore
     config.read(args.config)
@@ -104,22 +124,14 @@ def main() -> int:
             os.remove(script)
 
     filter_dict = {
-        "{4d36e967-e325-11ce-bfc1-08002be10318}": {
-            "LowerFilters": ["EhStorClass"]
-        },
+        "{4d36e967-e325-11ce-bfc1-08002be10318}": {"LowerFilters": ["EhStorClass"]},
         "{71a27cdd-812a-11d0-bec7-08002be2092f}": {
             "LowerFilters": ["fvevol", "iorate", "rdyboost"],
-            "UpperFilters": ["volsnap"]
+            "UpperFilters": ["volsnap"],
         },
-        "{4d36e96c-e325-11ce-bfc1-08002be10318}": {
-            "UpperFilters": ["ksthunk"]
-        },
-        "{6bdd1fc6-810f-11d0-bec7-08002be2092f}": {
-            "UpperFilters": ["ksthunk"]
-        },
-        "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}": {
-            "UpperFilters": ["ksthunk"]
-        }
+        "{4d36e96c-e325-11ce-bfc1-08002be10318}": {"UpperFilters": ["ksthunk"]},
+        "{6bdd1fc6-810f-11d0-bec7-08002be2092f}": {"UpperFilters": ["ksthunk"]},
+        "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}": {"UpperFilters": ["ksthunk"]},
     }
 
     ds_lines = []
@@ -143,9 +155,13 @@ def main() -> int:
                 for driver in filter_dict[filter_name][filter_type]:
                     if driver in service_dump:
                         ds_value = append_filter(filter_name, filter_type, service_dump)
-                        ds_lines.append(f'reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ds_value}" /f')
+                        ds_lines.append(
+                            f'reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{ds_value}" /f'
+                        )
                         es_value = split_lines(read_value(f"{class_hive}\\{filter_name}", filter_type))  # type: ignore
-                        es_lines.append(f'reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{es_value}" /f')
+                        es_lines.append(
+                            f'reg.exe add "HKLM\\{class_hive}\\{filter_name}" /v "{filter_type}" /t REG_MULTI_SZ /d "{es_value}" /f'
+                        )
                         break
 
     ds_start_value = 0
@@ -157,10 +173,14 @@ def main() -> int:
                 ds_start_value = 3
             else:
                 ds_start_value = 4
-            ds_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f')
+            ds_lines.append(
+                f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{ds_start_value}" /f'
+            )
 
             es_start_value = str(read_value(f"{services_hive}\\{item}", "Start"))
-            es_lines.append(f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f')
+            es_lines.append(
+                f'Reg.exe add "HKLM\\{services_hive}\\{item}" /v "Start" /t REG_DWORD /d "{es_start_value}" /f'
+            )
 
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
@@ -176,6 +196,7 @@ def main() -> int:
     print("info: done")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

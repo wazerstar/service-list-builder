@@ -185,13 +185,13 @@ def main() -> int:
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
 
-    with open("build\\Services-Disable.bat", "a", encoding="utf-8") as f:
+    with open("build\\Services-Disable.bat", "a", encoding="utf-8") as file:
         for line in ds_lines:
-            f.write(f"{line}\n")
+            file.write(f"{line}\n")
 
-    with open("build\\Services-Enable.bat", "a", encoding="utf-8") as f:
+    with open("build\\Services-Enable.bat", "a", encoding="utf-8") as file:
         for line in es_lines:
-            f.write(f"{line}\n")
+            file.write(f"{line}\n")
 
     print("info: done")
 

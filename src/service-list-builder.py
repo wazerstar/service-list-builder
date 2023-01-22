@@ -109,10 +109,6 @@ def main():
 
     service_dump = sorted(service_dump, key=str.lower)
 
-    for script in ["build\\Services-Disable.bat", "build\\Services-Enable.bat"]:
-        if os.path.exists(script):
-            os.remove(script)
-
     filter_dict = {
         "{4d36e967-e325-11ce-bfc1-08002be10318}": {"LowerFilters": ["EhStorClass"]},
         "{71a27cdd-812a-11d0-bec7-08002be2092f}": {
@@ -175,11 +171,11 @@ def main():
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
 
-    with open("build\\Services-Disable.bat", "a", encoding="utf-8") as file:
+    with open("build\\Services-Disable.bat", "w", encoding="utf-8") as file:
         for line in ds_lines:
             file.write(f"{line}\n")
 
-    with open("build\\Services-Enable.bat", "a", encoding="utf-8") as file:
+    with open("build\\Services-Enable.bat", "w", encoding="utf-8") as file:
         for line in es_lines:
             file.write(f"{line}\n")
 

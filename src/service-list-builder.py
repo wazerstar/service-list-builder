@@ -12,15 +12,13 @@ class_hive = "SYSTEM\\CurrentControlSet\\Control\\Class"
 services_hive = "SYSTEM\\CurrentControlSet\\Services"
 
 
-def parse_config(section, array_name, cfg) -> None:
-    """parses the configuration file for this program"""
+def parse_config(section, array_name, cfg):
     for i in cfg[section]:
         if i != "" and i not in array_name:
             array_name.append(i)
 
 
-def append_filter(filter_name, filter_type, arr_name) -> str:
-    """prepares a list in the reg_mul_sz format"""
+def append_filter(filter_name, filter_type, arr_name):
     key_data = []
     with winreg.OpenKey(
         winreg.HKEY_LOCAL_MACHINE,
@@ -35,8 +33,7 @@ def append_filter(filter_name, filter_type, arr_name) -> str:
     return split_lines(key_data)
 
 
-def split_lines(arr_name) -> str:
-    """prepares a list in the reg_multi_sz format with null characters"""
+def split_lines(arr_name):
     string = ""
     for i in arr_name:
         string += i
@@ -45,12 +42,9 @@ def split_lines(arr_name) -> str:
     return string
 
 
-def read_value(path, value_name) -> list | None:
-    """read keys in windows registry"""
+def read_value(path, value_name):
     try:
-        with winreg.OpenKey(
-            winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY
-        ) as key:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
             try:
                 return winreg.QueryValueEx(key, value_name)[0]
             except FileNotFoundError:
@@ -59,9 +53,7 @@ def read_value(path, value_name) -> list | None:
         return None
 
 
-def main() -> int:
-    """program entrypoint"""
-
+def main():
     version = "0.3.6"
 
     print(f"service-list-builder v{version}")
@@ -69,7 +61,7 @@ def main() -> int:
 
     if not ctypes.windll.shell32.IsUserAnAdmin():
         print("error: administrator privileges required")
-        return 1
+        return
 
     if getattr(sys, "frozen", False):
         os.chdir(os.path.dirname(sys.executable))
@@ -88,11 +80,9 @@ def main() -> int:
 
     if not os.path.exists(args.config):
         print("error: config file not found")
-        return 1
+        return
 
-    config = ConfigParser(
-        allow_no_value=True, delimiters=("="), inline_comment_prefixes="#"
-    )
+    config = ConfigParser(allow_no_value=True, delimiters=("="), inline_comment_prefixes="#")
     # prevent lists imported as lowercase
     config.optionxform = str  # type: ignore
     config.read(args.config)
@@ -195,8 +185,6 @@ def main() -> int:
 
     print("info: done")
 
-    return 0
-
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()

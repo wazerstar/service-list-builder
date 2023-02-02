@@ -12,11 +12,11 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
     - Note: All entries are case sensitive
 
-    - Every user mode service **NOT** specified in the **[Automatic_Services]** and **[Manual_Services]** sections will get disabled. These two sections act as whitelist of user mode services **NOT** to disable.
+    - Every user mode service **NOT** specified in the **[automatic]** and **[manual]** sections will get disabled. These two sections act as whitelist of user mode services **NOT** to disable.
 
-    - Kernel mode services to disable can be explicitly specified in the **[Drivers_To_Disable]** section. This section does not follow the "disable all except" logic. Only the kernel mode services specified in this section will get disabled
+    - Kernel mode services to disable can be explicitly specified in the **[disable_drivers]** section. This section does not follow the "disable all except" logic. Only the kernel mode services specified in this section will get disabled
 
-    - Paths to folders or binaries can be specified in the **[Toggle_Files_Folders]** section. The logic behind this is that when a binary gets renamed to anything other than its original file name, it will not run. Avoid folders and binaries with ``#`` in the name due to conflict with inline comments
+    - Paths to folders or binaries can be specified in the **[rename_binaries]** section. The logic behind this is that when a binary gets renamed to anything other than its original file name, it will not run. Avoid folders and binaries with ``#`` in the name due to conflict with inline comments
 
 - Pass **lists.ini** as an argument to the program through the command-line with the command below to build the scripts
 

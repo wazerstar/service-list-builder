@@ -69,10 +69,10 @@ def main() -> None:
     config.optionxform = str  # type: ignore
     config.read(args.config)
 
-    automatic = set(service for service in config["Automatic_Services"] if service)
-    manual = set(service for service in config["Manual_Services"] if service)
-    service_dump = set(driver for driver in config["Drivers_To_Disable"] if driver)
-    rename_binaries = set(binary for binary in config["Toggle_Files_Folders"] if binary)
+    automatic = set(service for service in config["automatic"] if service)
+    manual = set(service for service in config["manual"] if service)
+    service_dump = set(driver for driver in config["disable_drivers"] if driver)
+    rename_binaries = set(binary for binary in config["rename_binaries"] if binary)
 
     statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 

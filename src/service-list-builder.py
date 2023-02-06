@@ -1,10 +1,11 @@
-from typing import Any, List, Tuple, Union
-import winreg
-import os
-import sys
-from configparser import ConfigParser
 import argparse
 import ctypes
+import os
+import sys
+import winreg
+from configparser import ConfigParser
+from typing import Any, List, Tuple, Union
+
 import win32con
 import win32service
 
@@ -78,7 +79,7 @@ def main() -> None:
 
     if automatic or manual:
         service_name: str
-        for (service_name, _, _) in statuses:  # TODO: populate list manually by looping through keys
+        for service_name, _, _ in statuses:  # TODO: populate list manually by looping through keys
             # remove _XXXXX user services id
             if "_" in service_name:
                 service_name = service_name.rpartition("_")[0]

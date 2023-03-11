@@ -17,10 +17,7 @@ def split_lines(array: List[str]) -> str:
 def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
     try:
         with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path, 0, winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
-            try:
-                return winreg.QueryValueEx(key, value_name)[0]
-            except FileNotFoundError:
-                return None
+            return winreg.QueryValueEx(key, value_name)[0]
     except FileNotFoundError:
         return None
 

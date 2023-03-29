@@ -104,7 +104,7 @@ def main() -> None:
 
     for filter_id, filter_types in filter_dict.items():  # TODO: loop through keys instead of hardcoding them
         for filter_type in filter_types:
-            original: List[str] = read_value(f"{class_hive}\\{filter_id}", filter_type)  # type: ignore
+            original: Union[List[str], None] = read_value(f"{class_hive}\\{filter_id}", filter_type)  # type: ignore
 
             # check if the filter exists
             if original is not None:

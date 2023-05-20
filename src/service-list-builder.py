@@ -144,6 +144,8 @@ def main() -> None:
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
 
+    os.makedirs("build", exist_ok=True)
+
     with open("build\\Services-Disable.bat", "w", encoding="utf-8") as file:
         for line in ds_lines:
             file.write(f"{line}\n")

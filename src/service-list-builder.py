@@ -22,7 +22,7 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
         return None
 
 
-def main() -> None:
+def main() -> int:
     version = "0.4.0"
 
     filter_dict = {
@@ -41,7 +41,7 @@ def main() -> None:
 
     if not ctypes.windll.shell32.IsUserAnAdmin():
         print("error: administrator privileges required")
-        return
+        return 1
 
     if getattr(sys, "frozen", False):
         os.chdir(os.path.dirname(sys.executable))
@@ -60,7 +60,7 @@ def main() -> None:
 
     if not os.path.exists(args.config):
         print("error: config file not found")
-        return
+        return 1
 
     config = ConfigParser(allow_no_value=True, delimiters=("="), inline_comment_prefixes="#")
     # prevent lists imported as lowercase
@@ -156,6 +156,8 @@ def main() -> None:
 
     print("info: done")
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

@@ -6,8 +6,10 @@ import winreg
 from configparser import ConfigParser
 from typing import Any, List, Tuple, Union
 
+import pywintypes
 import win32con
 import win32service
+import win32serviceutil
 
 
 def split_lines(array: List[str]) -> str:
@@ -56,6 +58,11 @@ def main() -> int:
         help="path to lists config file",
         required=True,
     )
+    parser.add_argument(
+        "--disable_running",
+        help="only disable services specified in the list that are currently running",
+        action="store_true",
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.config):
@@ -84,6 +91,16 @@ def main() -> int:
             service_dump.add(service_name)
 
     service_dump = sorted(service_dump, key=str.lower)
+
+    if args.disable_running:
+        for service in service_dump:
+            try:
+                if not win32serviceutil.QueryServiceStatus(service)[1] == win32service.SERVICE_RUNNING:
+                    service_dump.remove(service)
+            except pywintypes.error as e:
+                # ignore if service does not exist
+                if e.args[0] == 1060:
+                    pass
 
     # store contents of batch scripts
     ds_lines: List[str] = []
@@ -143,6 +160,10 @@ def main() -> int:
 
     ds_lines.append("shutdown /r /f /t 0")
     es_lines.append("shutdown /r /f /t 0")
+
+    if len(ds_lines) == 2:
+        print("info: there are no changes to write to the scripts")
+        return 0
 
     os.makedirs("build", exist_ok=True)
 

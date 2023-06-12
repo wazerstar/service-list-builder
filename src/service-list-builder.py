@@ -25,7 +25,7 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
 
 
 def main() -> int:
-    version = "0.4.0"
+    version = "0.4.1"
 
     filter_dict = {
         "{4d36e967-e325-11ce-bfc1-08002be10318}": {"LowerFilters"},

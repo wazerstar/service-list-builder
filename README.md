@@ -1,6 +1,6 @@
 # service-list-builder
 
-I am not responsible for damage caused to computer. This tool is powerful and for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. It is also recommended that you use this tool before installing any programs as any other services not defined in the lists will be disabled (e.g. services installed by anticheats, or you could simply enable them after building the scripts, but the first method is recommended).
+I am not responsible for damage caused to computer. This tool is powerful and for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. It is also recommended that you use this tool before installing any programs as any other services not defined in the lists will be disabled (e.g. services installed by anticheats, or you could simply enable them after building the scripts, but the first method is recommended). If you would like to rebuild the scripts, ensure to run the generated ``Services-Enable.bat`` script beforehand as the tool relies on the current state of services for building future scripts.
 
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/amitxv)
 
@@ -18,7 +18,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
     - Paths to folders or binaries can be specified in the **[rename_binaries]** section. The logic behind this is that when a binary gets renamed to anything other than its original file name, it will not run. Avoid folders and binaries with ``#`` in the name due to conflict with inline comments
 
-- Pass **lists.ini** as an argument to the program through the command-line with the command below to build the scripts
+- Pass ``lists.ini`` as an argument to the program through the command-line with the command below to build the scripts
 
   ```bat
   service-list-builder --config "lists.ini"

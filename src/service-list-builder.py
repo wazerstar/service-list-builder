@@ -38,8 +38,7 @@ def main() -> int:
     class_hive = "SYSTEM\\CurrentControlSet\\Control\\Class"
     services_hive = "SYSTEM\\CurrentControlSet\\Services"
 
-    print(f"service-list-builder v{version}")
-    print("GitHub - https://github.com/amitxv\n")
+    print(f"service-list-builder Version {version}\nCopyright (C) github.com/amitxv. All rights reserved.\n")
 
     if not ctypes.windll.shell32.IsUserAnAdmin():
         print("error: administrator privileges required")

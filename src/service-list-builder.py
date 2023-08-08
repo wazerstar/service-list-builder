@@ -35,8 +35,7 @@ def main() -> int:
         "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}": {"UpperFilters"},
     }
 
-    class_hive = "SYSTEM\\CurrentControlSet\\Control\\Class"
-    services_hive = "SYSTEM\\CurrentControlSet\\Services"
+    HIVE = "SYSTEM\\CurrentControlSet"
 
     print(f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\n")
 
@@ -105,9 +104,6 @@ def main() -> int:
     ds_lines: List[str] = []
     es_lines: List[str] = []
 
-    ds_lines.append("@echo off")
-    es_lines.append("@echo off")
-
     for binary in rename_binaries:
         if os.path.exists(binary):
             file_name: str = os.path.basename(binary)
@@ -120,7 +116,7 @@ def main() -> int:
 
     for filter_id, filter_types in filter_dict.items():  # TODO: loop through keys instead of hardcoding them
         for filter_type in filter_types:
-            original: Union[List[str], None] = read_value(f"{class_hive}\\{filter_id}", filter_type)  # type: ignore
+            original: Union[List[str], None] = read_value(f"{HIVE}\\Control\\Class\\{filter_id}", filter_type)  # type: ignore
 
             # check if the filter exists
             if original is not None:
@@ -132,14 +128,14 @@ def main() -> int:
                 # check if original was modified at all
                 if original != new:
                     ds_lines.append(
-                        f'reg.exe add "HKLM\\{class_hive}\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{split_lines(new)}" /f'
+                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{split_lines(new)}" /f'
                     )
                     es_lines.append(
-                        f'reg.exe add "HKLM\\{class_hive}\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{split_lines(original)}" /f'
+                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{split_lines(original)}" /f'
                     )
 
     for service in service_dump:
-        original_start_value = read_value(f"{services_hive}\\{service}", "Start")
+        original_start_value = read_value(f"{HIVE}\\Services\\{service}", "Start")
 
         if original_start_value is not None:
             if service in automatic:
@@ -150,19 +146,21 @@ def main() -> int:
                 new_start_value = 4
 
             ds_lines.append(
-                f'reg.exe add "HKLM\\{services_hive}\\{service}" /v "Start" /t REG_DWORD /d "{new_start_value}" /f'
+                f'reg.exe add "HKLM\\%HIVE%\\Services\\{service}" /v "Start" /t REG_DWORD /d "{new_start_value}" /f'
             )
 
             es_lines.append(
-                f'reg.exe add "HKLM\\{services_hive}\\{service}" /v "Start" /t REG_DWORD /d "{original_start_value}" /f'
+                f'reg.exe add "HKLM\\%HIVE%\\Services\\{service}" /v "Start" /t REG_DWORD /d "{original_start_value}" /f'
             )
 
-    ds_lines.append("shutdown /r /f /t 0")
-    es_lines.append("shutdown /r /f /t 0")
-
-    if len(ds_lines) == 2:
+    if not ds_lines:
         print("info: there are no changes to write to the scripts")
         return 0
+
+    for array in (ds_lines, es_lines):
+        array.insert(0, "@echo off")
+        array.insert(1, f'set "HIVE={HIVE}"')
+        array.append("shutdown /r /f /t 0")
 
     os.makedirs("build", exist_ok=True)
 

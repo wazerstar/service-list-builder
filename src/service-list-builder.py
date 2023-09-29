@@ -12,7 +12,7 @@ import win32service
 import win32serviceutil
 
 
-def split_lines(array: List[str]) -> str:
+def null_terminator(array: List[str]) -> str:
     return "\\0".join(array)
 
 
@@ -25,7 +25,7 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
 
 
 def main() -> int:
-    version = "0.4.2"
+    version = "0.5.0"
 
     filter_dict = {
         "{4d36e967-e325-11ce-bfc1-08002be10318}": {"LowerFilters"},
@@ -72,14 +72,13 @@ def main() -> int:
     config.optionxform = str  # type: ignore
     config.read(args.config)
 
-    automatic = set(service for service in config["automatic"] if service)
-    manual = set(service for service in config["manual"] if service)
-    service_dump = set(driver for driver in config["disable_drivers"] if driver)
+    enabled_services = set(service for service in config["enabled_services"] if service)
+    service_dump = set(driver for driver in config["individual_disabled_services"] if driver)
     rename_binaries = set(binary for binary in config["rename_binaries"] if binary)
 
     statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
 
-    if automatic or manual:
+    if enabled_services:
         service_name: str
         for service_name, _, _ in statuses:  # TODO: populate list manually by looping through keys
             # remove _XXXXX user services id
@@ -128,25 +127,18 @@ def main() -> int:
                 # check if original was modified at all
                 if original != new:
                     ds_lines.append(
-                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{split_lines(new)}" /f'
+                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(new)}" /f'
                     )
                     es_lines.append(
-                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{split_lines(original)}" /f'
+                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(original)}" /f'
                     )
 
     for service in service_dump:
         original_start_value = read_value(f"{HIVE}\\Services\\{service}", "Start")
 
         if original_start_value is not None:
-            if service in automatic:
-                new_start_value = 2
-            elif service in manual:
-                new_start_value = 3
-            else:
-                new_start_value = 4
-
             ds_lines.append(
-                f'reg.exe add "HKLM\\%HIVE%\\Services\\{service}" /v "Start" /t REG_DWORD /d "{new_start_value}" /f'
+                f'reg.exe add "HKLM\\%HIVE%\\Services\\{service}" /v "Start" /t REG_DWORD /d "{original_start_value if service in enabled_services else 4}" /f'
             )
 
             es_lines.append(

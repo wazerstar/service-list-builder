@@ -105,7 +105,12 @@ def main() -> int:
 
     for binary in rename_binaries:
         if os.path.exists(binary):
-            file_name: str = os.path.basename(binary)
+            file_name = os.path.basename(binary)
+            file_extension = os.path.splitext(file_name)[1]
+
+            if file_extension == ".exe":
+                ds_lines.append(f"taskkill /f /im {file_name}")
+
             last_index = binary[-1]  # .exe gets renamed to .exee
             ds_lines.append(f'REN "{binary}" "{file_name}{last_index}"')
             es_lines.append(f'REN "{binary}{last_index}" "{file_name}"')

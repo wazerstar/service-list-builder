@@ -33,7 +33,7 @@ jobs:
           move "src\build" service-list-builder
           move "src\lists.ini" service-list-builder
 
-      - name: Zip service-list-builder
+      - name: Zip release
         run: Compress-Archive -Path service-list-builder -DestinationPath service-list-builder.zip
 
       - name: Upload to release

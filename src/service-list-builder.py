@@ -41,11 +41,10 @@ def main() -> int:
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--config",
+        "config",
         metavar="<config>",
         type=str,
         help="path to lists config file",
-        required=True,
     )
     parser.add_argument(
         "--disable_running",

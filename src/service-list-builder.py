@@ -24,7 +24,7 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
 
 
 def main() -> int:
-    version = "0.5.1"
+    version = "0.5.2"
 
     HIVE = "SYSTEM\\CurrentControlSet"
 

@@ -7,7 +7,6 @@ from configparser import ConfigParser
 from typing import Any, List, Tuple, Union
 
 import pywintypes
-import win32con
 import win32service
 import win32serviceutil
 
@@ -76,16 +75,20 @@ def main() -> int:
     service_dump = set(driver for driver in config["individual_disabled_services"] if driver)
     rename_binaries = set(binary for binary in config["rename_binaries"] if binary)
 
-    statuses = win32service.EnumServicesStatus(win32service.OpenSCManager(None, None, win32con.GENERIC_READ))
-
     if enabled_services:
-        service_name: str
-        for service_name, _, _ in statuses:  # TODO: populate list manually by looping through keys
-            # remove _XXXXX user services id
-            if "_" in service_name:
-                service_name = service_name.rpartition("_")[0]
+        # populate service_dump with all user mode services
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{HIVE}\\Services") as key:
+            num_subkeys = winreg.QueryInfoKey(key)[0]
 
-            service_dump.add(service_name)
+            for i in range(num_subkeys):
+                service_name = winreg.EnumKey(key, i)
+                service_type: int = read_value(f"{HIVE}\\Services\\{service_name}", "Type")  # type: ignore
+
+                if service_type in (16, 32, 96, 288, 80, 272):
+                    if "_" in service_name:
+                        service_name = service_name.rpartition("_")[0]
+
+                    service_dump.add(service_name)
 
     service_dump = sorted(service_dump, key=str.lower)
 

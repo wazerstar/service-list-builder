@@ -26,14 +26,6 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
 def main() -> int:
     version = "0.5.1"
 
-    filter_dict = {
-        "{4d36e967-e325-11ce-bfc1-08002be10318}": {"LowerFilters"},
-        "{71a27cdd-812a-11d0-bec7-08002be2092f}": {"LowerFilters", "UpperFilters"},
-        "{4d36e96c-e325-11ce-bfc1-08002be10318}": {"UpperFilters"},
-        "{6bdd1fc6-810f-11d0-bec7-08002be2092f}": {"UpperFilters"},
-        "{ca3e7ab9-b4c3-4ae6-8251-579ef933890f}": {"UpperFilters"},
-    }
-
     HIVE = "SYSTEM\\CurrentControlSet"
 
     print(f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\n")
@@ -121,25 +113,30 @@ def main() -> int:
             # TODO: ask user if they want to disable it anyway and argument to supress all choices
             print(f"info: item does not exist: {binary}")
 
-    for filter_id, filter_types in filter_dict.items():  # TODO: loop through keys instead of hardcoding them
-        for filter_type in filter_types:
-            original: Union[List[str], None] = read_value(f"{HIVE}\\Control\\Class\\{filter_id}", filter_type)  # type: ignore
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{HIVE}\\Control\\Class") as key:
+        num_subkeys = winreg.QueryInfoKey(key)[0]
 
-            # check if the filter exists
-            if original is not None:
-                new = original.copy()  # to keep a backup of the original
-                for driver in original:
-                    if driver in service_dump:
-                        new.remove(driver)
+        for i in range(num_subkeys):
+            filter_id = winreg.EnumKey(key, i)
 
-                # check if original was modified at all
-                if original != new:
-                    ds_lines.append(
-                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(new)}" /f'
-                    )
-                    es_lines.append(
-                        f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(original)}" /f'
-                    )
+            for filter_type in ("LowerFilters", "UpperFilters"):
+                original: Union[List[str], None] = read_value(f"{HIVE}\\Control\\Class\\{filter_id}", filter_type)  # type: ignore
+
+                # check if the filter exists
+                if original is not None:
+                    new = original.copy()  # to keep a backup of the original
+                    for driver in original:
+                        if driver in service_dump:
+                            new.remove(driver)
+
+                    # check if original was modified at all
+                    if original != new:
+                        ds_lines.append(
+                            f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(new)}" /f'
+                        )
+                        es_lines.append(
+                            f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(original)}" /f'
+                        )
 
     for service in service_dump:
         original_start_value = read_value(f"{HIVE}\\Services\\{service}", "Start")

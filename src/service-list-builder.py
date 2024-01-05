@@ -28,7 +28,9 @@ def main() -> int:
 
     HIVE = "SYSTEM\\CurrentControlSet"
 
-    print(f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\n")
+    print(
+        f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\nDonate - https://www.buymeacoffee.com/amitxv\n"
+    )
 
     if not ctypes.windll.shell32.IsUserAnAdmin():
         print("error: administrator privileges required")

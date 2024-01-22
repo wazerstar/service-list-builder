@@ -92,22 +92,25 @@ def main() -> int:
         os.chdir(os.path.dirname(__file__))
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
+
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         "--config",
         metavar="<config>",
         type=str,
         help="path to lists config file",
     )
-    parser.add_argument(
-        "--disable_running",
-        help="only disable services specified in the list that are currently running",
-        action="store_true",
-    )
-    parser.add_argument(
+    group.add_argument(
         "--get_dependencies",
         metavar="<service>",
         type=str,
         help="returns the entire dependency tree for a given service",
+    )
+
+    parser.add_argument(
+        "--disable_running",
+        help="only disable services specified in the list that are currently running",
+        action="store_true",
     )
     parser.add_argument(
         "--kernel_mode",
@@ -118,6 +121,9 @@ def main() -> int:
 
     if args.kernel_mode and not args.get_dependencies:
         parser.error("--kernel_mode can only be used with --get_dependencies")
+
+    if args.disable_running and not args.config:
+        parser.error("--disable_running can only be used with --config")
 
     if args.get_dependencies:
         lower_get_dependencies = args.get_dependencies.lower()

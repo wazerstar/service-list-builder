@@ -3,8 +3,9 @@ import ctypes
 import os
 import sys
 import winreg
+from collections import deque
 from configparser import ConfigParser, SectionProxy
-from typing import Any, Dict, List, Set, Tuple, Union
+from typing import Any, Deque, Dict, List, Set, Tuple, Union
 
 import win32service
 import win32serviceutil
@@ -155,8 +156,8 @@ def main() -> int:
                 service_dump.remove(service)
 
     # store contents of batch scripts
-    ds_lines: List[str] = []
-    es_lines: List[str] = []
+    ds_lines: Deque[str] = deque()
+    es_lines: Deque[str] = deque()
 
     for binary in rename_binaries:
         if os.path.exists(binary):
@@ -216,8 +217,8 @@ def main() -> int:
         return 0
 
     for array in (ds_lines, es_lines):
-        array.insert(0, "@echo off")
-        array.insert(1, f'set "HIVE={HIVE}"')
+        array.appendleft(f'set "HIVE={HIVE}"')
+        array.appendleft("@echo off")
         array.append("shutdown /r /f /t 0")
 
     os.makedirs("build", exist_ok=True)

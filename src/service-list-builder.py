@@ -76,6 +76,7 @@ def parse_config_list(service_list: SectionProxy, present_services: Dict[str, st
 
 def main() -> int:
     version = "0.5.3"
+    present_services = get_present_services()
 
     print(
         f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\nDonate - https://www.buymeacoffee.com/amitxv\n"
@@ -92,7 +93,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "config",
+        "--config",
         metavar="<config>",
         type=str,
         help="path to lists config file",
@@ -102,7 +103,40 @@ def main() -> int:
         help="only disable services specified in the list that are currently running",
         action="store_true",
     )
+    parser.add_argument(
+        "--get_dependencies",
+        metavar="<service>",
+        type=str,
+        help="returns the entire dependency tree for a given service",
+    )
+    parser.add_argument(
+        "--kernel_mode",
+        help="includes kernel-mode services in the dependency tree when using --get_dependencies",
+        action="store_true",
+    )
     args = parser.parse_args()
+
+    if args.kernel_mode and not args.get_dependencies:
+        parser.error("--kernel_mode can only be used with --get_dependencies")
+
+    if args.get_dependencies:
+        lower_get_dependencies = args.get_dependencies.lower()
+        if lower_get_dependencies not in present_services:
+            print(f"error: {args.get_dependencies} not exists as a service")
+            return 1
+
+        dependencies = {
+            present_services[dependency.lower()]
+            for dependency in get_dependencies(args.get_dependencies, args.kernel_mode)
+        }
+        service_name = present_services[lower_get_dependencies]
+
+        print(
+            f"{service_name} has 0 dependencies"
+            if len(dependencies) == 0
+            else f"{service_name} depends on {', '.join(dependencies)}"
+        )
+        return 0
 
     if not os.path.exists(args.config):
         print("error: config file not found")
@@ -112,8 +146,6 @@ def main() -> int:
     # prevent lists imported as lowercase
     config.optionxform = str  # type: ignore
     config.read(args.config)
-
-    present_services = get_present_services()
 
     # load sections from config and handle case insensitive entries
     enabled_services = parse_config_list(config["enabled_services"], present_services)

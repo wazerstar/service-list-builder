@@ -10,7 +10,7 @@ from typing import Any, Deque, Dict, List, Set, Tuple, Union
 import win32service
 import win32serviceutil
 
-from constants import HIVE, USER_MODE_TYPES
+from service_list_builder.constants import HIVE, USER_MODE_TYPES
 
 
 def null_terminator(array: List[str]) -> str:

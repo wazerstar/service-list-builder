@@ -10,8 +10,6 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 - Open **lists.ini** in a text editor
 
-    - Note: All entries are case-sensitive
-
     - Every user mode service **NOT** specified in the ``[enabled_services]`` section will get disabled. These two sections act as whitelist of user mode services **NOT** to disable
 
     - Individual services to disable can be explicitly specified in the ``[individual_disabled_services]`` section. This section does not follow the *disable all except* logic. Only the services specified in this section will get disabled. This is useful in situations where the user only needs to disable a few user mode services instead of using the *batch* approach with ``[enabled_services]`` or would like to disable kernel mode services at all
@@ -21,7 +19,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 - Pass ``lists.ini`` as an argument to the program through the command-line with the command below to build the scripts
 
   ```bat
-  service-list-builder "lists.ini"
+  service-list-builder --config "lists.ini"
   ```
 
 - The scripts will be built in the **build** folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with **Enable All Privileges** checkbox enabled to prevent errors when writing to registry and renaming files

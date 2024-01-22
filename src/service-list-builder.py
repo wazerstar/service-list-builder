@@ -172,7 +172,6 @@ def main() -> int:
             ds_lines.append(f'REN "{binary}" "{file_name}{last_index}"')
             es_lines.append(f'REN "{binary}{last_index}" "{file_name}"')
         else:
-            # TODO: ask user if they want to disable it anyway and argument to supress all choices
             print(f"info: item does not exist: {binary}")
 
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{HIVE}\\Control\\Class") as key:

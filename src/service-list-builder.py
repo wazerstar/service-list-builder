@@ -3,12 +3,13 @@ import ctypes
 import os
 import sys
 import winreg
-from configparser import ConfigParser
-from typing import Any, List, Tuple, Union
+from configparser import ConfigParser, SectionProxy
+from typing import Any, Dict, List, Set, Tuple, Union
 
-import pywintypes
 import win32service
 import win32serviceutil
+
+from constants import HIVE, USER_MODE_TYPES
 
 
 def null_terminator(array: List[str]) -> str:
@@ -23,10 +24,56 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
         return None
 
 
+def get_dependencies(service: str) -> Set[str]:
+    dependencies: Union[List[str], None] = read_value(f"{HIVE}\\Services\\{service}", "DependOnService")  # type: ignore
+
+    # base case
+    if dependencies is None or len(dependencies) == 0:
+        return set()
+
+    # remove kernel-mode services from dependencies list so we are left with user-mode dependencies only
+    for dependecy in dependencies:
+        service_type: int = read_value(f"{HIVE}\\Services\\{dependecy}", "Type")  # type: ignore
+
+        if service_type not in USER_MODE_TYPES:
+            dependencies.remove(dependecy)
+
+    child_dependencies = {
+        child_dependency for dependency in dependencies for child_dependency in get_dependencies(dependency)
+    }
+
+    return set(dependencies).union(child_dependencies)
+
+
+def get_present_services() -> Dict[str, str]:
+    # keeps track of service in lowercase (key) and actual service name (value)
+    present_services: Dict[str, str] = {}
+
+    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{HIVE}\\Services") as key:
+        num_subkeys = winreg.QueryInfoKey(key)[0]
+
+        for i in range(num_subkeys):
+            service_name = winreg.EnumKey(key, i)
+
+            # handle (remove) user ID in service name
+            if "_" in service_name:
+                service_name = service_name.rpartition("_")[0]
+
+            present_services[service_name.lower()] = service_name
+
+    return present_services
+
+
+def parse_config_list(service_list: SectionProxy, present_services: Dict[str, str]) -> Set[str]:
+    return {
+        present_services[lower_service]
+        for service in service_list
+        if (lower_service := service.lower()) in present_services
+    }
+
+
 def main() -> int:
     version = "0.5.3"
-
-    HIVE = "SYSTEM\\CurrentControlSet"
 
     print(
         f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\nDonate - https://www.buymeacoffee.com/amitxv\n"
@@ -64,36 +111,48 @@ def main() -> int:
     config.optionxform = str  # type: ignore
     config.read(args.config)
 
-    enabled_services = set(service for service in config["enabled_services"] if service)
-    service_dump = set(driver for driver in config["individual_disabled_services"] if driver)
-    rename_binaries = set(binary for binary in config["rename_binaries"] if binary)
+    present_services = get_present_services()
+
+    # load sections from config and handle case insensitive entries
+    enabled_services = parse_config_list(config["enabled_services"], present_services)
+    service_dump = parse_config_list(config["individual_disabled_services"], present_services)
+    rename_binaries = set(binary for binary in config["rename_binaries"] if binary != "")
+
+    # check dependencies
+    has_dependency_errors = False
+
+    # required for lowercase comparison
+    lower_services_set: Set[str] = {service.lower() for service in enabled_services}
+
+    for service in enabled_services:
+        # get a set of the dependencies in lowercase
+        dependencies = set(service.lower() for service in get_dependencies(service))
+
+        # check which dependencies are not in the user's list
+        # then get the actual name from present_services as it was converted to lowercase to handle case inconsistency in Windows
+        missing_dependencies = {
+            present_services[dependency] for dependency in dependencies.difference(lower_services_set)
+        }
+
+        if len(missing_dependencies) > 0:
+            has_dependency_errors = True
+            print(f"error: {service} depends on {', '.join(missing_dependencies)}")
+
+    if has_dependency_errors:
+        return 1
 
     if enabled_services:
         # populate service_dump with all user mode services
-        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{HIVE}\\Services") as key:
-            num_subkeys = winreg.QueryInfoKey(key)[0]
+        for _, service_name in present_services.items():
+            service_type: int = read_value(f"{HIVE}\\Services\\{service_name}", "Type")  # type: ignore
 
-            for i in range(num_subkeys):
-                service_name = winreg.EnumKey(key, i)
-                service_type: int = read_value(f"{HIVE}\\Services\\{service_name}", "Type")  # type: ignore
-
-                if service_type in (16, 32, 96, 288, 80, 272):
-                    if "_" in service_name:
-                        service_name = service_name.rpartition("_")[0]
-
-                    service_dump.add(service_name)
-
-    service_dump = sorted(service_dump, key=str.lower)
+            if service_type in USER_MODE_TYPES:
+                service_dump.add(service_name)
 
     if args.disable_running:
         for service in service_dump:
-            try:
-                if not win32serviceutil.QueryServiceStatus(service)[1] == win32service.SERVICE_RUNNING:
-                    service_dump.remove(service)
-            except pywintypes.error as e:
-                # ignore if service does not exist
-                if e.args[0] == 1060:
-                    pass
+            if not win32serviceutil.QueryServiceStatus(service)[1] == win32service.SERVICE_RUNNING:
+                service_dump.remove(service)
 
     # store contents of batch scripts
     ds_lines: List[str] = []
@@ -105,6 +164,7 @@ def main() -> int:
             file_extension = os.path.splitext(file_name)[1]
 
             if file_extension == ".exe":
+                # processes should be killed before being renamed
                 ds_lines.append(f"taskkill /f /im {file_name}")
 
             last_index = binary[-1]  # .exe gets renamed to .exee
@@ -139,7 +199,7 @@ def main() -> int:
                             f'reg.exe add "HKLM\\%HIVE%\\Control\\Class\\{filter_id}" /v "{filter_type}" /t REG_MULTI_SZ /d "{null_terminator(original)}" /f'
                         )
 
-    for service in service_dump:
+    for service in sorted(service_dump, key=str.lower):
         original_start_value = read_value(f"{HIVE}\\Services\\{service}", "Start")
 
         if original_start_value is not None:

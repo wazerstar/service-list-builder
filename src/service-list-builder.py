@@ -75,7 +75,7 @@ def parse_config_list(service_list: SectionProxy, present_services: Dict[str, st
 
 
 def main() -> int:
-    version = "0.5.4"
+    version = "0.5.5"
     present_services = get_present_services()
 
     print(

@@ -34,11 +34,11 @@ def get_dependencies(service: str, kernel_mode: bool = False) -> Set[str]:
 
     if not kernel_mode:
         # remove kernel-mode services from dependencies list so we are left with user-mode dependencies only
-        for dependecy in dependencies:
-            service_type: int = read_value(f"{HIVE}\\Services\\{dependecy}", "Type")  # type: ignore
-
-            if service_type not in USER_MODE_TYPES:
-                dependencies.remove(dependecy)
+        dependencies = [
+            dependency
+            for dependency in dependencies
+            if read_value(f"{HIVE}\\Services\\{dependency}", "Type") in USER_MODE_TYPES
+        ]
 
     child_dependencies = {
         child_dependency for dependency in dependencies for child_dependency in get_dependencies(dependency)
@@ -190,7 +190,7 @@ def main() -> int:
                 service_dump.add(service_name)
 
     if args.disable_running:
-        for service in service_dump:
+        for service in service_dump.copy():
             if not win32serviceutil.QueryServiceStatus(service)[1] == win32service.SERVICE_RUNNING:
                 service_dump.remove(service)
 

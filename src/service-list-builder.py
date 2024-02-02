@@ -26,7 +26,7 @@ def read_value(path: str, value_name: str) -> Union[Tuple[Any, int], None]:
 
 
 def get_dependencies(service: str, kernel_mode: bool = False) -> Set[str]:
-    dependencies: Union[List[str], None] = read_value(f"{HIVE}\\Services\\{service}", "DependOnService")  # type: ignore
+    dependencies: Union[List[str], None] = read_value(f"{HIVE}\\Services\\{service}", "DependOnService")
 
     # base case
     if dependencies is None or len(dependencies) == 0:
@@ -150,7 +150,7 @@ def main() -> int:
 
     config = ConfigParser(allow_no_value=True, delimiters=("="), inline_comment_prefixes="#")
     # prevent lists imported as lowercase
-    config.optionxform = str  # type: ignore
+    config.optionxform = str
     config.read(args.config)
 
     # load sections from config and handle case insensitive entries
@@ -184,7 +184,7 @@ def main() -> int:
     if enabled_services:
         # populate service_dump with all user mode services
         for _, service_name in present_services.items():
-            service_type: int = read_value(f"{HIVE}\\Services\\{service_name}", "Type")  # type: ignore
+            service_type: int = read_value(f"{HIVE}\\Services\\{service_name}", "Type")
 
             if service_type in USER_MODE_TYPES:
                 service_dump.add(service_name)
@@ -220,7 +220,7 @@ def main() -> int:
             filter_id = winreg.EnumKey(key, i)
 
             for filter_type in ("LowerFilters", "UpperFilters"):
-                original: Union[List[str], None] = read_value(f"{HIVE}\\Control\\Class\\{filter_id}", filter_type)  # type: ignore
+                original: Union[List[str], None] = read_value(f"{HIVE}\\Control\\Class\\{filter_id}", filter_type)
 
                 # check if the filter exists
                 if original is not None:

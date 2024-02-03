@@ -83,7 +83,7 @@ def parse_config_list(
     }
 
 
-def main() -> int:  # noqa: PLR0911, C901, PLR0912, D103, PLR0915
+def main() -> int:
     version = "0.5.5"
     present_services = get_present_services()
 

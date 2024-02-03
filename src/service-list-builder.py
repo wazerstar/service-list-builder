@@ -13,7 +13,6 @@ from constants import HIVE, USER_MODE_TYPES
 
 
 def read_value(path: str, value_name: str) -> Any | None:
-    """Read key values from Windows registry."""
     try:
         with winreg.OpenKey(
             winreg.HKEY_LOCAL_MACHINE,
@@ -27,7 +26,6 @@ def read_value(path: str, value_name: str) -> Any | None:
 
 
 def get_dependencies(service: str, kernel_mode: bool) -> set[str]:
-    """Return dependency tree for a given service."""
     dependencies: list[str] | None = read_value(
         f"{HIVE}\\Services\\{service}",
         "DependOnService",
@@ -56,10 +54,6 @@ def get_dependencies(service: str, kernel_mode: bool) -> set[str]:
 
 
 def get_present_services() -> dict[str, str]:
-    """Get all installed services and return a dict[str, str].
-
-    Key is service name in lowercase and value is uppercase
-    """
     # keeps track of service in lowercase (key) and actual service name (value)
     present_services: dict[str, str] = {}
 
@@ -82,7 +76,6 @@ def parse_config_list(
     service_list: SectionProxy,
     present_services: dict[str, str],
 ) -> set[str]:
-    """Return a set of valid entries in the config."""
     return {
         present_services[lower_service]
         for service in service_list

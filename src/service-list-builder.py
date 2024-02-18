@@ -1,12 +1,16 @@
 import argparse
 import ctypes
 import os
+import re
 import sys
 import winreg
 from collections import deque
 from configparser import ConfigParser, SectionProxy
+from ctypes import wintypes
 from typing import Any
 
+import pywintypes
+import win32api
 import win32service
 import win32serviceutil
 from constants import HIVE, USER_MODE_TYPES
@@ -83,6 +87,17 @@ def parse_config_list(
     }
 
 
+def get_file_metadata(file_path: str, attribute: str) -> str:
+    lang, code_page = win32api.GetFileVersionInfo(
+        file_path, "\\VarFileInfo\\Translation"
+    )[0]
+
+    file_info_key = f"\\StringFileInfo\\{lang:04x}{code_page:04x}\\"
+    product_name = win32api.GetFileVersionInfo(file_path, f"{file_info_key}{attribute}")
+
+    return str(product_name)
+
+
 def main() -> int:
     version = "0.5.5"
     present_services = get_present_services()
@@ -124,6 +139,11 @@ def main() -> int:
     parser.add_argument(
         "--kernel_mode",
         help="includes kernel-mode services in the dependency tree when using --get_dependencies",
+        action="store_true",
+    )
+    parser.add_argument(
+        "--disable_service_warning",
+        help="disable the non-Windows services warning",
         action="store_true",
     )
     args = parser.parse_args()
@@ -210,6 +230,64 @@ def main() -> int:
 
                 if service_type in USER_MODE_TYPES:
                     service_dump.add(service_name)
+
+    if not args.disable_service_warning:
+        # define CommandLineToArgvW from winapi
+        CommandLineToArgvW = ctypes.windll.shell32.CommandLineToArgvW
+        CommandLineToArgvW.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(ctypes.c_int)]
+        CommandLineToArgvW.restype = ctypes.POINTER(wintypes.LPWSTR)
+
+        # check if any services are non-Windows services as the user
+        # likely does not want to disable these
+        non_microsoft_service_count = 0
+
+        for service_name in service_dump:
+            image_path = read_value(f"{HIVE}\\Services\\{service_name}", "ImagePath")
+
+            if image_path is None:
+                continue
+
+            argv_ptr = CommandLineToArgvW(
+                ctypes.create_unicode_buffer(image_path), ctypes.byref(ctypes.c_int(0))
+            )
+
+            if argv_ptr is None:
+                print(f"error: CommandLineToArgvW failed for {image_path}")
+                return 1
+
+            # expand vars
+            binary_path: str = os.path.expandvars(argv_ptr[0])
+
+            # resolve paths
+            if binary_path.startswith("\\SystemRoot"):
+                binary_path = binary_path.replace("\\SystemRoot", "C:\\Windows")
+
+            if binary_path.startswith("System32"):
+                binary_path = binary_path.replace("System32", "C:\\Windows\\System32")
+
+            if binary_path.startswith("system32"):
+                binary_path = binary_path.replace("system32", "C:\\Windows\\System32")
+
+            if not os.path.exists(binary_path):
+                print(f"error: unable to get path for {service_name}")
+                continue
+
+            try:
+                if (
+                    get_file_metadata(binary_path, "CompanyName")
+                    != "Microsoft Corporation"
+                ):
+                    non_microsoft_service_count += 1
+                    print(f'warning: "{service_name}" is not a Windows service')
+            except pywintypes.error:
+                print(f"error: unable to get CompanyName for {binary_path}")
+                non_microsoft_service_count += 1
+
+        if non_microsoft_service_count != 0:
+            print(
+                f"\nwarning: {non_microsoft_service_count} non-Windows services detected. are you sure you want to disable these?\nedit the config or use --disable_service_warning to suppress this warning if this is intentional"
+            )
+            return 1
 
     if args.disable_running:
         for service in service_dump.copy():

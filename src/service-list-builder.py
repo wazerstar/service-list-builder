@@ -242,7 +242,7 @@ def main() -> int:
             "\\??\\": "",
         }
 
-        for service_name in present_services.values():
+        for service_name in service_dump:
             image_path = read_value(f"{HIVE}\\Services\\{service_name}", "ImagePath")
 
             if image_path is None:

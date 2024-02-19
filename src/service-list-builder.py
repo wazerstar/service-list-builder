@@ -6,7 +6,6 @@ import sys
 import winreg
 from collections import deque
 from configparser import ConfigParser, SectionProxy
-from ctypes import wintypes
 from typing import Any
 
 import pywintypes
@@ -232,55 +231,56 @@ def main() -> int:
                     service_dump.add(service_name)
 
     if not args.disable_service_warning:
-        # define CommandLineToArgvW from winapi
-        CommandLineToArgvW = ctypes.windll.shell32.CommandLineToArgvW
-        CommandLineToArgvW.argtypes = [wintypes.LPCWSTR, ctypes.POINTER(ctypes.c_int)]
-        CommandLineToArgvW.restype = ctypes.POINTER(wintypes.LPWSTR)
-
         # check if any services are non-Windows services as the user
         # likely does not want to disable these
         non_microsoft_service_count = 0
 
-        for service_name in service_dump:
+        # use lowercase key as the path will be converted to lowercase when comparing
+        replacements = {
+            "\\systemroot\\": "C:\\Windows\\",
+            "system32\\": "C:\\Windows\\System32\\",
+            "\\??\\": "",
+        }
+
+        for service_name in present_services.values():
             image_path = read_value(f"{HIVE}\\Services\\{service_name}", "ImagePath")
 
             if image_path is None:
                 continue
 
-            argv_ptr = CommandLineToArgvW(
-                ctypes.create_unicode_buffer(image_path), ctypes.byref(ctypes.c_int(0))
-            )
+            path_match = re.match(r".*?\.(exe|sys)\b", image_path, re.IGNORECASE)
 
-            if argv_ptr is None:
-                print(f"error: CommandLineToArgvW failed for {image_path}")
-                return 1
+            if path_match is None:
+                print(f"error: path match failed for {image_path}")
+                continue
 
             # expand vars
-            binary_path: str = os.path.expandvars(argv_ptr[0])
+            binary_path: str = os.path.expandvars(path_match[0])
+            lower_binary_path = binary_path.lower()
 
             # resolve paths
-            if binary_path.startswith("\\SystemRoot"):
-                binary_path = binary_path.replace("\\SystemRoot", "C:\\Windows")
+            if lower_binary_path.startswith('"'):
+                lower_binary_path = lower_binary_path[1:]
 
-            if binary_path.startswith("System32"):
-                binary_path = binary_path.replace("System32", "C:\\Windows\\System32")
+            for starts_with, replacement in replacements.items():
+                if lower_binary_path.startswith(starts_with):
+                    lower_binary_path = lower_binary_path.replace(
+                        starts_with, replacement
+                    )
 
-            if binary_path.startswith("system32"):
-                binary_path = binary_path.replace("system32", "C:\\Windows\\System32")
-
-            if not os.path.exists(binary_path):
+            if not os.path.exists(lower_binary_path):
                 print(f"error: unable to get path for {service_name}")
                 continue
 
             try:
                 if (
-                    get_file_metadata(binary_path, "CompanyName")
+                    get_file_metadata(lower_binary_path, "CompanyName")
                     != "Microsoft Corporation"
                 ):
                     non_microsoft_service_count += 1
                     print(f'warning: "{service_name}" is not a Windows service')
             except pywintypes.error:
-                print(f"error: unable to get CompanyName for {binary_path}")
+                print(f'error: unable to get CompanyName for "{service_name}"')
                 non_microsoft_service_count += 1
 
         if non_microsoft_service_count != 0:

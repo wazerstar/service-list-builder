@@ -218,8 +218,12 @@ def main() -> int:
         return 1
 
     if enabled_services:
-        # populate service_dump with all user mode services
-        for service_name in present_services.values():
+        # populate service_dump with all user mode services that are not in enabled_services section
+        for lower_service_name, service_name in present_services.items():
+            # don't add services that the user want's to keep enabled in the service dump
+            if lower_service_name in lower_services_set:
+                continue
+
             service_type = read_value(f"{HIVE}\\Services\\{service_name}", "Type")
 
             if service_type is not None:
@@ -344,7 +348,7 @@ def main() -> int:
 
         if original_start_value is not None:
             ds_lines.append(
-                f'reg.exe add "HKLM\\%HIVE%\\Services\\{service}" /v "Start" /t REG_DWORD /d "{original_start_value if service in enabled_services else 4}" /f',
+                f'reg.exe add "HKLM\\%HIVE%\\Services\\{service}" /v "Start" /t REG_DWORD /d "4" /f',
             )
 
             es_lines.append(

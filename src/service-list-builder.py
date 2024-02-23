@@ -99,7 +99,7 @@ def get_file_metadata(file_path: str, attribute: str) -> str:
 
 
 def main() -> int:
-    version = "0.5.7"
+    version = "0.5.8"
     present_services = get_present_services()
 
     print(

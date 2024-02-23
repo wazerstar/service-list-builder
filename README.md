@@ -50,9 +50,9 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 
 5. Navigate to ``.\Windows\System32\config`` and load the ``SYSTEM`` hive by selecting it
 
-6. You should get prompted to enter ``tempSYSTEM``
+6. You should get prompted to enter a name for it. Type ``tempSYSTEM``
 
-7. Now that the hive is loaded, open your ``Services-Enable.bat`` in a text editor such as notepad and edit the ``HIVE`` variable at the top of the script. For example, change ``set "HIVE=SYSTEM\CurrentControlSet"`` to ``set "HIVE=tempSYSTEM\ControlSet001"`` depending on the control set loaded
+7. Now that the hive is loaded, open your ``Services-Enable.bat`` script in a text editor such as notepad and edit the ``HIVE`` variable at the top of the script. For example, change ``set "HIVE=SYSTEM\CurrentControlSet"`` to ``set "HIVE=tempSYSTEM\ControlSet001"`` depending on the control set loaded
 
 8. Run the ``Services-Enable.bat`` script with NSudo
 

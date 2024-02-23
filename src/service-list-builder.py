@@ -236,6 +236,7 @@ def main() -> int:
         # check if any services are non-Windows services as the user
         # likely does not want to disable these
         non_microsoft_service_count = 0
+        unknown_company_service_count = 0
 
         # use lowercase key as the path will be converted to lowercase when comparing
         replacements = {
@@ -254,6 +255,7 @@ def main() -> int:
 
             if path_match is None:
                 print(f"error: path match failed for {image_path}")
+                unknown_company_service_count += 1
                 continue
 
             # expand vars
@@ -270,6 +272,7 @@ def main() -> int:
 
             if not os.path.exists(lower_binary_path):
                 print(f"error: unable to get path for {service_name}")
+                unknown_company_service_count += 1
                 continue
 
             try:
@@ -279,15 +282,15 @@ def main() -> int:
                     raise pywintypes.error
 
                 if company_name != "Microsoft Corporation":
-                    non_microsoft_service_count += 1
                     print(f'warning: "{service_name}" is not a Windows service')
+                    non_microsoft_service_count += 1
             except pywintypes.error:
                 print(f'error: unable to get CompanyName for "{service_name}"')
-                non_microsoft_service_count += 1
+                unknown_company_service_count += 1
 
-        if non_microsoft_service_count != 0:
+        if non_microsoft_service_count + unknown_company_service_count != 0:
             print(
-                f"\nwarning: {non_microsoft_service_count} non-Windows services detected. are you sure you want to disable these?\nedit the config or use --disable_service_warning to suppress this warning if this is intentional"
+                f"\nwarning: {non_microsoft_service_count} non-Windows services detected, {unknown_company_service_count} service vendors are unknown. are you sure you want to disable these?\nedit the config or use --disable_service_warning to suppress this warning if this is intentional"
             )
             return 1
 

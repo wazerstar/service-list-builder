@@ -269,7 +269,12 @@ def main() -> int:
                 continue
 
             try:
-                if get_file_metadata(lower_binary_path, "CompanyName") != "Microsoft Corporation":
+                company_name = get_file_metadata(lower_binary_path, "CompanyName")
+
+                if not company_name:
+                    raise pywintypes.error
+
+                if company_name != "Microsoft Corporation":
                     non_microsoft_service_count += 1
                     print(f'warning: "{service_name}" is not a Windows service')
             except pywintypes.error:

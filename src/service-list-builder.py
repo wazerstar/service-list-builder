@@ -92,6 +92,9 @@ def get_file_metadata(file_path: str, attribute: str) -> str:
     file_info_key = f"\\StringFileInfo\\{lang:04x}{code_page:04x}\\"
     product_name = win32api.GetFileVersionInfo(file_path, f"{file_info_key}{attribute}")
 
+    if not product_name:
+        return ""
+
     return str(product_name)
 
 

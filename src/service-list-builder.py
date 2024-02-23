@@ -87,9 +87,7 @@ def parse_config_list(
 
 
 def get_file_metadata(file_path: str, attribute: str) -> str:
-    lang, code_page = win32api.GetFileVersionInfo(
-        file_path, "\\VarFileInfo\\Translation"
-    )[0]
+    lang, code_page = win32api.GetFileVersionInfo(file_path, "\\VarFileInfo\\Translation")[0]
 
     file_info_key = f"\\StringFileInfo\\{lang:04x}{code_page:04x}\\"
     product_name = win32api.GetFileVersionInfo(file_path, f"{file_info_key}{attribute}")
@@ -201,15 +199,12 @@ def main() -> int:
 
     for service in enabled_services:
         # get a set of the dependencies in lowercase
-        dependencies = {
-            service.lower() for service in get_dependencies(service, kernel_mode=False)
-        }
+        dependencies = {service.lower() for service in get_dependencies(service, kernel_mode=False)}
 
         # check which dependencies are not in the user's list
         # then get the actual name from present_services as it was converted to lowercase to handle case inconsistency in Windows
         missing_dependencies = {
-            present_services[dependency]
-            for dependency in dependencies.difference(lower_services_set)
+            present_services[dependency] for dependency in dependencies.difference(lower_services_set)
         }
 
         if len(missing_dependencies) > 0:
@@ -264,19 +259,14 @@ def main() -> int:
 
             for starts_with, replacement in replacements.items():
                 if lower_binary_path.startswith(starts_with):
-                    lower_binary_path = lower_binary_path.replace(
-                        starts_with, replacement
-                    )
+                    lower_binary_path = lower_binary_path.replace(starts_with, replacement)
 
             if not os.path.exists(lower_binary_path):
                 print(f"error: unable to get path for {service_name}")
                 continue
 
             try:
-                if (
-                    get_file_metadata(lower_binary_path, "CompanyName")
-                    != "Microsoft Corporation"
-                ):
+                if get_file_metadata(lower_binary_path, "CompanyName") != "Microsoft Corporation":
                     non_microsoft_service_count += 1
                     print(f'warning: "{service_name}" is not a Windows service')
             except pywintypes.error:
@@ -291,10 +281,7 @@ def main() -> int:
 
     if args.disable_running:
         for service in service_dump.copy():
-            if (
-                not win32serviceutil.QueryServiceStatus(service)[1]
-                == win32service.SERVICE_RUNNING
-            ):
+            if not win32serviceutil.QueryServiceStatus(service)[1] == win32service.SERVICE_RUNNING:
                 service_dump.remove(service)
 
     # store contents of batch scripts

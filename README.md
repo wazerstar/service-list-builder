@@ -28,7 +28,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 ## Example
 
-<img src="./img/lists.png" width="1000">
+<img src="/assets/img/lists.png" width="1000">
 
 ## Debugging Services
 

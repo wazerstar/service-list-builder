@@ -36,14 +36,14 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Build executable
-        run: pyinstaller "service_list_builder\main.py" --onefile --name service-list-builder
+        run: pyinstaller service_list_builder\main.py --onefile --name service-list-builder
 
       - name: Create folder structure
         run: |
           mkdir building\service-list-builder
-          move "dist\service-list-builder.exe" building\service-list-builder
-          move "service_list_builder\build" building\service-list-builder
-          move "service_list_builder\lists.ini" building\service-list-builder
+          move dist\service-list-builder.exe building\service-list-builder
+          move service_list_builder\build building\service-list-builder
+          move service_list_builder\lists.ini building\service-list-builder
 
       - name: Zip release
         run: Compress-Archive -Path building\service-list-builder -DestinationPath service-list-builder.zip

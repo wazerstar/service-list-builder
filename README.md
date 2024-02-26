@@ -40,7 +40,7 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 
 2. Run the script with NSudo
 
-3. Now that the services should be restored, boot to the operating system. Don't forget to change the ``HIVE`` variable back to it's default
+3. Now that the services should be restored, boot to the operating system. Don't forget to change the ``DRIVE_LETTER`` variable back to it's default value
 
 ## Debugging Services
 

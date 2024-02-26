@@ -32,6 +32,9 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 ## Restoring Services Offline
 
+> [!IMPORTANT]
+> The methodology is only applicable to scripts built with service-list-builder v1.0.0 and above which was released on [26/02/2024](https://github.com/amitxv/service-list-builder/releases/tag/1.0.0)
+
 If you are unable to boot or something goes completely wrong after running ``Services-Disable.bat`` for whatever reason, you can simply restore them offline by loading the registry hive and running the ``Services-Enable.bat`` script. This requires an already installed dual-boot, Windows recovery environment or Windows setup.
 
 1. Open the ``Services-Enable.bat`` script in a text editor and change the ``DRIVE_LETTER`` variable to the partition in which the problematic Windows installation is installed to (be careful not to use the wrong drive letter if multiple dual-boots are configured)

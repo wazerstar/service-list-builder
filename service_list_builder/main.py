@@ -1,5 +1,6 @@
 import argparse
 import ctypes
+import logging
 import os
 import re
 import sys
@@ -15,6 +16,8 @@ import win32service
 import win32serviceutil
 from constants import HIVE, USER_MODE_TYPES
 
+logger = logging.getLogger("CLI")
+
 
 def read_value(path: str, value_name: str) -> Any | None:
     try:
@@ -25,7 +28,8 @@ def read_value(path: str, value_name: str) -> Any | None:
             winreg.KEY_READ | winreg.KEY_WOW64_64KEY,
         ) as key:
             return winreg.QueryValueEx(key, value_name)[0]
-    except FileNotFoundError:
+    except FileNotFoundError as e:
+        logger.exception("key not found %s", e)
         return None
 
 
@@ -69,6 +73,7 @@ def get_present_services() -> dict[str, str]:
 
             # handle (remove) user ID in service name
             if "_" in service_name:
+                logger.debug('removing "_" in "%s"', service_name)
                 service_name = service_name.rpartition("_")[0]
 
             present_services[service_name.lower()] = service_name
@@ -100,6 +105,8 @@ def get_file_metadata(file_path: str, attribute: str) -> str:
 
 
 def main() -> int:
+    logging.basicConfig(format="[%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
+
     version = "0.6.0"
     present_services = get_present_services()
 
@@ -108,7 +115,7 @@ def main() -> int:
     )
 
     if not ctypes.windll.shell32.IsUserAnAdmin():
-        print("error: administrator privileges required")
+        logger.error("administrator privileges required")
         return 1
 
     if getattr(sys, "frozen", False):
@@ -158,7 +165,7 @@ def main() -> int:
     if args.get_dependencies:
         lower_get_dependencies = args.get_dependencies.lower()
         if lower_get_dependencies not in present_services:
-            print(f"error: {args.get_dependencies} not exists as a service")
+            logger.error("%s not exists as a service", args.get_dependencies)
             return 1
 
         dependencies = {
@@ -175,7 +182,7 @@ def main() -> int:
         return 0
 
     if not os.path.exists(args.config):
-        print("error: config file not found")
+        logger.error("config file %s not found", args.config)
         return 1
 
     config = ConfigParser(
@@ -213,7 +220,7 @@ def main() -> int:
 
         if len(missing_dependencies) > 0:
             has_dependency_errors = True
-            print(f"error: {service} depends on {', '.join(missing_dependencies)}")
+            logger.error("%s depends on %s", service, ", ".join(missing_dependencies))
 
     if has_dependency_errors:
         return 1
@@ -255,7 +262,7 @@ def main() -> int:
             path_match = re.match(r".*?\.(exe|sys)\b", image_path, re.IGNORECASE)
 
             if path_match is None:
-                print(f"error: path match failed for {image_path}")
+                logger.error("path match failed for %s", image_path)
                 unknown_company_service_count += 1
                 continue
 
@@ -272,7 +279,7 @@ def main() -> int:
                     lower_binary_path = lower_binary_path.replace(starts_with, replacement)
 
             if not os.path.exists(lower_binary_path):
-                print(f"error: unable to get path for {service_name}")
+                logger.error("unable to get path for %s", service_name)
                 unknown_company_service_count += 1
                 continue
 
@@ -283,15 +290,15 @@ def main() -> int:
                     raise pywintypes.error
 
                 if company_name != "Microsoft Corporation":
-                    print(f'warning: "{service_name}" is not a Windows service')
+                    print(f'"{service_name}" is not a Windows service')
                     non_microsoft_service_count += 1
             except pywintypes.error:
-                print(f'error: unable to get CompanyName for "{service_name}"')
+                logger.error('unable to get CompanyName for "%s"', service_name)
                 unknown_company_service_count += 1
 
         if non_microsoft_service_count + unknown_company_service_count != 0:
             print(
-                f"\nwarning: {non_microsoft_service_count} non-Windows services detected, {unknown_company_service_count} service vendors are unknown. are you sure you want to disable these?\nedit the config or use --disable_service_warning to suppress this warning if this is intentional"
+                f"\n{non_microsoft_service_count} non-Windows services detected, {unknown_company_service_count} service vendors are unknown. are you sure you want to disable these?\nedit the config or use --disable_service_warning to suppress this warning if this is intentional"
             )
             return 1
 
@@ -317,7 +324,7 @@ def main() -> int:
             ds_lines.append(f'REN "{binary}" "{file_name}{last_index}"')
             es_lines.append(f'REN "{binary}{last_index}" "{file_name}"')
         else:
-            print(f"info: item does not exist: {binary}")
+            logger.info("item does not exist: %s... skipping", binary)
 
     with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, f"{HIVE}\\Control\\Class") as key:
         num_subkeys = winreg.QueryInfoKey(key)[0]
@@ -360,7 +367,7 @@ def main() -> int:
             )
 
     if not ds_lines:
-        print("info: there are no changes to write to the scripts")
+        logger.info("there are no changes to write to the scripts")
         return 0
 
     for array in (ds_lines, es_lines):
@@ -382,7 +389,7 @@ def main() -> int:
         for line in es_lines:
             file.write(f"{line}\n")
 
-    print("info: done")
+    logger.info("done")
 
     return 0
 

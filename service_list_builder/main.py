@@ -6,6 +6,7 @@ import sys
 import winreg
 from collections import deque
 from configparser import ConfigParser, SectionProxy
+from datetime import datetime
 from typing import Any
 
 import pywintypes
@@ -367,13 +368,17 @@ def main() -> int:
         array.appendleft("@echo off")
         array.append("shutdown /r /f /t 0")
 
-    os.makedirs("build", exist_ok=True)
+    current_time = datetime.now()
 
-    with open("build\\Services-Disable.bat", "w", encoding="utf-8") as file:
+    build_dir = os.path.join("build", f"build-{current_time.strftime("%d%m%y%H%M%S")}")
+
+    os.makedirs(build_dir)
+
+    with open(os.path.join(build_dir, "Services-Disable.bat"), "w", encoding="utf-8") as file:
         for line in ds_lines:
             file.write(f"{line}\n")
 
-    with open("build\\Services-Enable.bat", "w", encoding="utf-8") as file:
+    with open(os.path.join(build_dir, "Services-Enable.bat"), "w", encoding="utf-8") as file:
         for line in es_lines:
             file.write(f"{line}\n")
 

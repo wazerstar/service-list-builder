@@ -103,7 +103,7 @@ def main() -> int:
     present_services = get_present_services()
 
     print(
-        f"service-list-builder Version {version} - GPLv3\nGitHub - https://github.com/amitxv\nDonate - https://www.buymeacoffee.com/amitxv\n",
+        f"service-list-builder Version {version} - GPLv3\n",
     )
 
     if not ctypes.windll.shell32.IsUserAnAdmin():

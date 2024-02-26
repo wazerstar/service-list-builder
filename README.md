@@ -30,12 +30,6 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 <img src="/assets/img/lists.png" width="1000">
 
-## Debugging Services
-
-Often while experimenting, some specific functionality might be broken after running the ``Services-Disable.bat`` script but works as intended after running the ``Services-Enable.bat`` script. If the functionality is still broken after enabling services, then the problem is not related to services.
-
-You need to find out what services are required for the functionality using the systematic methodology below. Once you have found which services are a dependency of the given functionality, you can update your ``lists.ini`` and/or ``Services-Disable.bat`` script.
-
 ## Restoring Services Offline
 
 If you are unable to boot or something goes completely wrong after running ``Services-Disable.bat`` for whatever reason, you can simply restore them offline by loading the registry hive and running the ``Services-Enable.bat`` script. This requires an already installed dual-boot, Windows recovery environment or Windows setup.
@@ -47,6 +41,12 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 2. Run the script with NSudo
 
 3. Now that the services should be restored, boot to the operating system. Don't forget to change the ``HIVE`` variable back to it's default
+
+## Debugging Services
+
+Often while experimenting, some specific functionality might be broken after running the ``Services-Disable.bat`` script but works as intended after running the ``Services-Enable.bat`` script. If the functionality is still broken after enabling services, then the problem is not related to services.
+
+You need to find out what services are required for the functionality using the systematic methodology below. Once you have found which services are a dependency of the given functionality, you can update your ``lists.ini`` and/or ``Services-Disable.bat`` script.
 
 ### Methodology
 

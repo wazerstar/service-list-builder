@@ -26,9 +26,9 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 - The scripts will be built in the **build** folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with ``Enable All Privileges`` option enabled to prevent errors when writing to registry and renaming files
 
-## Example
+<!-- ## Example
 
-<img src="/assets/img/lists.png" width="1000">
+<img src="/assets/img/lists.png" width="1000"> -->
 
 ## Restoring Services Offline
 

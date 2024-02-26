@@ -38,9 +38,9 @@ You need to find out what services are required for the functionality using the 
 
 ## Restoring Services Offline
 
-If you are unable to boot or something goes completely wrong after running ``Services-Disable.bat`` for whatever reason, you can simply restore them offline by loading the registry hive offline. This requires an already installed dual-boot or Windows recovery environment (Windows setup USB).
+If you are unable to boot or something goes completely wrong after running ``Services-Disable.bat`` for whatever reason, you can simply restore them offline by loading the registry hive offline. This requires an already installed dual-boot or Windows recovery environment or Windows setup.
 
-1. Open ``regedit``. If you are in Windows setup, you need to open CMD to open the registry editor by typing ``regedit``
+1. Open ``regedit``. If you are in WinRE or Windows setup, you need to open CMD to open the registry editor by typing ``regedit``
 
 2. Click ``HKEY_LOCAL_MACHIINE``
 
@@ -52,7 +52,7 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 
 6. You should get prompted to enter a name for it. Type ``tempSYSTEM``
 
-7. Now that the hive is loaded, open your ``Services-Enable.bat`` script in a text editor such as notepad and edit the ``HIVE`` variable at the top of the script. For example, change ``set "HIVE=SYSTEM\CurrentControlSet"`` to ``set "HIVE=tempSYSTEM\ControlSet001"`` depending on the control set loaded
+7. Now that the hive is loaded, open your ``Services-Enable.bat`` script in a text editor such as notepad and edit the ``HIVE`` variable at the top of the script. If you are in WinRE or Windows setup, you can access a file explorer window by typing ``notepad`` in CMD then use the ``File -> Open...`` dialog to browse the file system as you normally would. For example, change ``set "HIVE=SYSTEM\CurrentControlSet"`` to ``set "HIVE=tempSYSTEM\ControlSet001"`` depending on the control set loaded
 
 8. Run the ``Services-Enable.bat`` script with NSudo
 

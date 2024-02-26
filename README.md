@@ -51,7 +51,7 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 ### Methodology
 
 > [!IMPORTANT]
-> The methodology is only applicable to scripts built with service-list-builder v0.6.0 and above which was released on [23/02/2024](https://github.com/amitxv/service-list-builder/releases/tag/0.6.0)
+> The methodology is only applicable to scripts built with service-list-builder v0.6.0 and above which was released on [26/02/2024](https://github.com/amitxv/service-list-builder/releases/tag/1.0.0)
 
 1. If you haven't disabled services at this stage, run the ``Services-Disable.bat`` script
 

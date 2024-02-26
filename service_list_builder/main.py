@@ -28,8 +28,7 @@ def read_value(path: str, value_name: str) -> Any | None:
             winreg.KEY_READ | winreg.KEY_WOW64_64KEY,
         ) as key:
             return winreg.QueryValueEx(key, value_name)[0]
-    except FileNotFoundError as e:
-        logger.exception("key not found %s", e)
+    except FileNotFoundError:
         return None
 
 
@@ -389,7 +388,7 @@ def main() -> int:
         for line in es_lines:
             file.write(f"{line}\n")
 
-    logger.info("done")
+    logger.info("done - scripts built in .\\%s", build_dir)
 
     return 0
 

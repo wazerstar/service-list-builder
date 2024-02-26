@@ -38,25 +38,15 @@ You need to find out what services are required for the functionality using the 
 
 ## Restoring Services Offline
 
-If you are unable to boot or something goes completely wrong after running ``Services-Disable.bat`` for whatever reason, you can simply restore them offline by loading the registry hive offline. This requires an already installed dual-boot or Windows recovery environment or Windows setup.
+If you are unable to boot or something goes completely wrong after running ``Services-Disable.bat`` for whatever reason, you can simply restore them offline by loading the registry hive and running the ``Services-Enable.bat`` script. This requires an already installed dual-boot, Windows recovery environment or Windows setup.
 
-1. Open ``regedit``. If you are in WinRE or Windows setup, you need to open CMD to open the registry editor by typing ``regedit``
+1. Open the ``Services-Enable.bat`` script in a text editor and change the ``DRIVE_LETTER`` variable to the partition in which the problematic Windows installation is installed to (be careful not to use the wrong drive letter if multiple dual-boots are configured)
 
-2. Click ``HKEY_LOCAL_MACHIINE``
+    - If you are in WinRE or Windows setup, you can use notepad's ``File -> Open...`` dialog by typing ``notepad`` in CMD to browse the file system
 
-3. Navigate to ``File -> Load Hive...``
+2. Run the script with NSudo
 
-4. Determine the drive in which the problematic Windows installation is located (be careful not to use the wrong drive if multiple dual-boots are configured)
-
-5. Navigate to ``.\Windows\System32\config`` and load the ``SYSTEM`` hive by selecting it
-
-6. You should get prompted to enter a name for it. Type ``tempSYSTEM``
-
-7. Now that the hive is loaded, open your ``Services-Enable.bat`` script in a text editor such as notepad and edit the ``HIVE`` variable at the top of the script. If you are in WinRE or Windows setup, you can access a file explorer window by typing ``notepad`` in CMD then use the ``File -> Open...`` dialog to browse the file system as you normally would. For example, change ``set "HIVE=SYSTEM\CurrentControlSet"`` to ``set "HIVE=tempSYSTEM\ControlSet001"`` depending on the control set loaded
-
-8. Run the ``Services-Enable.bat`` script with NSudo
-
-9. Now that the services should be restored, boot to the operating system. Don't forget to change the ``HIVE`` variable back to it's default
+3. Now that the services should be restored, boot to the operating system. Don't forget to change the ``HIVE`` variable back to it's default
 
 ### Methodology
 
@@ -71,9 +61,9 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 
 3. Open the ``Services-Enable.bat`` and ``Debug-Services.bat`` scripts in a text editor
 
-4. Copy the line that sets the ``HIVE`` variable (it is ``set "HIVE=SYSTEM\CurrentControlSet"`` by default for all systems) and the lines that rename binaries if you have any (these lines begin with ``REN``) to the ``Debug-Services.bat`` script
+4. In the ``Services-Enable.bat`` script, copy all the lines from the start of the script until and including the ``reg query`` command into the ``Debug-Services.bat`` script. The lines that rename binaries (if you have any) must also be copied. These lines begin with ``REN``
 
-5. If you have any lines that change the ``LowerFilters`` and/or ``UpperFilters`` registry keys, you will need to handle those first, otherwise, you can continue to step 6 if you don't have any. Copy those lines and the line that changes the ``Start`` value for each driver in the filter to the ``Debug-Services.bat`` script. The null terminator character (``\0``) is not part of the driver name (e.g. ``\0iorate`` is ``iorate``).
+5. If you have any lines that change the ``LowerFilters`` and/or ``UpperFilters`` registry keys, you will need to handle those first, otherwise, you can continue to step 6 if you don't have any. Copy those lines and the line that changes the ``Start`` value for each driver inside the filter to the ``Debug-Services.bat`` script. The null terminator character (``\0``) is not part of the driver name (e.g. ``\0iorate`` is ``iorate``).
 
     <details>
 
@@ -106,7 +96,7 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 
 8. Test the functionality. If it is **NOT** working then return to step 6, otherwise, continue to step 9
 
-9. Disable the last 10 services in the ``Debug-Services.bat`` individually by changing the start value to 4 then restart your PC. Keep repeating until the functionality breaks again
+9. Disable the last 10 services in the ``Debug-Services.bat`` individually by changing the start value to 4 then restart your PC. Keep repeating until the functionality breaks again. When it breaks, continue to step 10
 
 10. Now that you have identified which service breaks the functionality, try to re-enable it. If you can reproduce the functionality breaking while the service is disabled and works with it enabled a few times, then make a note of this service in ``dependencies.txt`` and continue to the next step
 
@@ -118,6 +108,6 @@ If you are unable to boot or something goes completely wrong after running ``Ser
     service-list-builder.exe --kernel_mode --get_dependencies <service>
     ```
 
-13. For each service that you noted down in ``dependencies.txt``, get the default start value for each service from the ``Services-Enable.bat`` script and change the start value for the service in the ``Services-Disable.bat`` script. Run the ``Services-Disable.bat`` script with NSudo to check whether the functionality is working. If it is not working, return to step 1 and repeat the entire process with the newly edited/latest ``Services-Disable.bat`` script, otherwise, continue to step 14. This is because a service that is required for the functionality might not have any service dependencies
+13. For each service that you noted down in ``dependencies.txt``, get the default start value for it from the ``Services-Enable.bat`` script and change the start value for the service in the ``Services-Disable.bat`` script. Run the ``Services-Disable.bat`` script with NSudo to check whether the functionality is working. If it is not working, return to step 1 and repeat the entire process with the newly edited/latest ``Services-Disable.bat`` script, otherwise, continue to step 14. This is because a service that is required for the functionality might not have any service dependencies
 
 14. At this stage, your functionality should be working after running the ``Services-Disable.bat`` script. Now you can update your ``lists.ini`` with everything that you noted in ``dependencies.txt`` for the future

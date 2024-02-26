@@ -14,7 +14,7 @@ import pywintypes
 import win32api
 import win32service
 import win32serviceutil
-from constants import HIVE, USER_MODE_TYPES
+from constants import HIVE, LOAD_HIVE_LINES, USER_MODE_TYPES
 
 logger = logging.getLogger("CLI")
 
@@ -311,7 +311,7 @@ def main() -> int:
     es_lines: deque[str] = deque()
 
     for binary in rename_binaries:
-        if os.path.exists(binary):
+        if os.path.exists(f"C:{binary}"):
             file_name = os.path.basename(binary)
             file_extension = os.path.splitext(file_name)[1]
 
@@ -320,8 +320,8 @@ def main() -> int:
                 ds_lines.append(f"taskkill /f /im {file_name}")
 
             last_index = binary[-1]  # .exe gets renamed to .exee
-            ds_lines.append(f'REN "{binary}" "{file_name}{last_index}"')
-            es_lines.append(f'REN "{binary}{last_index}" "{file_name}"')
+            ds_lines.append(f'REN "%DRIVE_LETTER%:{binary}" "{file_name}{last_index}"')
+            es_lines.append(f'REN "%DRIVE_LETTER%:{binary}{last_index}" "{file_name}"')
         else:
             logger.info("item does not exist: %s... skipping", binary)
 
@@ -369,10 +369,11 @@ def main() -> int:
         logger.info("there are no changes to write to the scripts")
         return 0
 
-    for array in (ds_lines, es_lines):
-        array.appendleft(f'set "HIVE={HIVE}"')
-        array.appendleft("@echo off")
-        array.append("shutdown /r /f /t 0")
+    for script_lines in (ds_lines, es_lines):
+        for line in LOAD_HIVE_LINES.split("\n")[::-1]:
+            script_lines.appendleft(line)
+
+        script_lines.append("shutdown /r /f /t 0")
 
     current_time = datetime.now()
 

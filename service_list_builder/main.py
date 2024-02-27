@@ -106,7 +106,7 @@ def get_file_metadata(file_path: str, attribute: str) -> str:
 def main() -> int:
     logging.basicConfig(format="[%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 
-    version = "0.6.0"
+    version = "1.0.1"
     present_services = get_present_services()
 
     print(

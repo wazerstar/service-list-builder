@@ -7,9 +7,9 @@ REM Set drive letter to target
 set "DRIVE_LETTER=C"
 
 if "%DRIVE_LETTER%" == "C" (
-    reg load "HKLM\tempSYSTEM" "%DRIVE_LETTER%:\\Windows\\System32\\config\\SYSTEM"
+    reg load "HKLM\\tempSYSTEM" "%DRIVE_LETTER%:\\Windows\\System32\\config\\SYSTEM"
     if not %errorlevel% == 0 (echo error: failed to load SYSTEM hive && pause && exit /b 1)
-    set "HIVE=tempSYSTEM\\ControlSet001"
+    set "HIVE=HKLM\\tempSYSTEM\\ControlSet001"
 ) else (
     set "HIVE={HIVE}"
 )

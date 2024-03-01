@@ -49,7 +49,7 @@ If you are unable to boot or something goes completely wrong after running ``Ser
 
 Often while experimenting, some specific functionality might be broken after running the ``Services-Disable.bat`` script but works as intended after running the ``Services-Enable.bat`` script. If the functionality is still broken after enabling services, then the problem is not related to services.
 
-You need to find out what services are required for the functionality using the systematic methodology below. Once you have found which services are a dependency of the given functionality, you can update your ``lists.ini`` and/or ``Services-Disable.bat`` script.
+As a short-term and temporary solution, you can simply run ``Services-Enable.bat``, do whatever you are trying to do, then run ``Services-Disable.bat`` again (that's the idea of having toggle scripts!). For a long-term solution, you need to find out what services are required for the functionality using the systematic methodology below. Once you have found which services are a dependency of the given functionality, you can update your ``lists.ini`` and/or ``Services-Disable.bat`` script.
 
 ### Methodology
 

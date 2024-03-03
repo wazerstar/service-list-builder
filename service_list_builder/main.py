@@ -132,7 +132,7 @@ def main() -> int:
         help="path to lists config file",
     )
     group.add_argument(
-        "--get_dependencies",
+        "--get-dependencies",
         metavar="<service>",
         type=str,
         help="returns the entire dependency tree for a given service",

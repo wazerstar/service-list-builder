@@ -139,27 +139,27 @@ def main() -> int:
     )
 
     parser.add_argument(
-        "--disable_running",
+        "--disable-running",
         help="only disable services specified in the list that are currently running",
         action="store_true",
     )
     parser.add_argument(
-        "--kernel_mode",
+        "--kernel-mode",
         help="includes kernel-mode services in the dependency tree when using --get_dependencies",
         action="store_true",
     )
     parser.add_argument(
-        "--disable_service_warning",
+        "--disable-service-warning",
         help="disable the non-Windows services warning",
         action="store_true",
     )
     args = parser.parse_args()
 
     if args.kernel_mode and not args.get_dependencies:
-        parser.error("--kernel_mode can only be used with --get_dependencies")
+        parser.error("--kernel-mode can only be used with --get_dependencies")
 
     if args.disable_running and not args.config:
-        parser.error("--disable_running can only be used with --config")
+        parser.error("--disable-running can only be used with --config")
 
     if args.get_dependencies:
         lower_get_dependencies = args.get_dependencies.lower()
@@ -297,7 +297,7 @@ def main() -> int:
 
         if non_microsoft_service_count + unknown_company_service_count != 0:
             print(
-                f"\n{non_microsoft_service_count} non-Windows services detected, {unknown_company_service_count} service vendors are unknown. are you sure you want to disable these?\nedit the config or use --disable_service_warning to suppress this warning if this is intentional"
+                f"\n{non_microsoft_service_count} non-Windows services detected, {unknown_company_service_count} service vendors are unknown. are you sure you want to disable these?\nedit the config or use --disable-service-warning to suppress this warning if this is intentional"
             )
             return 1
 

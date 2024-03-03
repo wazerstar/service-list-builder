@@ -108,7 +108,7 @@ As a short-term and temporary solution, you can simply run ``Services-Enable.bat
 12. The service's dependencies must also be enabled if there are any. [service-list-builder](https://github.com/amitxv/service-list-builder) can be used to get the entire dependency tree for a given service with the command below. Note every dependency that appears in the output to ``dependencies.txt``
 
     ```bat
-    service-list-builder.exe --kernel_mode --get-dependencies <service>
+    service-list-builder.exe --kernel-mode --get-dependencies <service>
     ```
 
 13. For each service that you noted down in ``dependencies.txt``, get the default start value for it from the ``Services-Enable.bat`` script and change the start value for the service in the ``Services-Disable.bat`` script. Run the ``Services-Disable.bat`` script with NSudo to check whether the functionality is working. If it is not working, return to step 1 and repeat the entire process with the newly edited/latest ``Services-Disable.bat`` script, otherwise, continue to step 14. This is because a service that is required for the functionality might not have any service dependencies

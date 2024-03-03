@@ -145,7 +145,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--kernel-mode",
-        help="includes kernel-mode services in the dependency tree when using --get_dependencies",
+        help="includes kernel-mode services in the dependency tree when using --get-dependencies",
         action="store_true",
     )
     parser.add_argument(

@@ -40,7 +40,7 @@ jobs:
         run: .\build.ps1
 
       - name: Zip release
-        run: Compress-Archive -Path building\service-list-builder -DestinationPath service-list-builder.zip
+        run: Compress-Archive -Path build\service-list-builder -DestinationPath service-list-builder.zip
 
       - name: Create release
         uses: ncipollo/release-action@v1

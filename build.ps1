@@ -3,13 +3,16 @@ function main() {
         Remove-Item -Path ".\build\" -Recurse
     }
 
+    # entrypoint relative to .\build\pyinstaller\
+    $entryPoint = "..\..\service_list_builder\main.py"
+
     # create folder structure
     New-Item -ItemType Directory -Path ".\build\service-list-builder\"
 
     # pack executable
     New-Item -ItemType Directory -Path ".\build\pyinstaller\"
     Push-Location ".\build\pyinstaller\"
-    pyinstaller "..\..\service_list_builder\main.py" --onefile --name service-list-builder
+    pyinstaller $entryPoint --onefile --name service-list-builder
     Pop-Location
 
 

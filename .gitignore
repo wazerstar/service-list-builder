@@ -1,2 +1,4 @@
-
+tmp/
 *.pyc
+service_list_builder/NSudoLG.exe
+service_list_builder/build

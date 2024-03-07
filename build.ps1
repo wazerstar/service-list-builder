@@ -1,6 +1,6 @@
 function main() {
     if (Test-Path ".\build\") {
-        Remove-Item -Path ".\build\" -Recurse
+        Remove-Item -Path ".\build\" -Recurse -Force
     }
 
     # entrypoint relative to .\build\pyinstaller\
@@ -15,10 +15,8 @@ function main() {
     pyinstaller $entryPoint --onefile --name service-list-builder
     Pop-Location
 
-
     # create final package
     Copy-Item ".\build\pyinstaller\dist\service-list-builder.exe" ".\build\service-list-builder\"
-    Copy-Item ".\service_list_builder\build\" ".\build\service-list-builder\" -Recurse
     Copy-Item ".\service_list_builder\lists.ini" ".\build\service-list-builder\"
 
     return 0

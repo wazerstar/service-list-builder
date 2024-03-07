@@ -1,6 +1,6 @@
 function main() {
     if (Test-Path ".\tmp\") {
-        Remove-Item -Path ".\tmp\" -Recurse
+        Remove-Item -Path ".\tmp\" -Recurse -Force
     }
 
     $urls = @{
@@ -8,17 +8,17 @@ function main() {
     }
 
     # =============
-    # Setup MinSudo
+    # Setup NSudo
     # =============
     git clone $urls["NSudo"] ".\tmp\NSudo\"
     Push-Location ".\tmp\NSudo\"
 
-    # build MinSudo
+    # build NSudo
     MSBuild.exe ".\Source\Native\NSudo.sln" -p:Configuration=Release -p:Platform=x64
 
     Pop-Location
 
-    Copy-Item ".\tmp\NSudo\Source\Native\Output\Binaries\Release\x64\NSudoLG.exe" ".\service_list_builder\build"
+    Copy-Item ".\tmp\NSudo\Source\Native\Output\Binaries\Release\x64\NSudoLG.exe" ".\service_list_builder\"
 
     return 0
 }

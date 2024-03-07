@@ -1,8 +1,7 @@
 USER_MODE_TYPES = {16, 32, 96, 288, 80, 272}
 HIVE = "SYSTEM\\CurrentControlSet"
 
-LOAD_HIVE_LINES = f"""
-@echo off
+LOAD_HIVE_LINES = f"""@echo off
 REM Set drive letter to target
 set "DRIVE_LETTER=C"
 

@@ -103,19 +103,6 @@ def get_file_metadata(file_path: str, attribute: str) -> str:
     return str(product_name)
 
 
-def has_dependencies() -> bool:
-    missing_dependencies = 0
-
-    dependencies = ["NSudoLG.exe"]
-
-    for dependency in dependencies:
-        if not os.path.exists(dependency):
-            logger.error("%s not found", dependency)
-            missing_dependencies += 1
-
-    return missing_dependencies == 0
-
-
 def main() -> int:
     logging.basicConfig(format="[%(name)s] %(levelname)s: %(message)s", level=logging.INFO)
 
@@ -125,9 +112,6 @@ def main() -> int:
     print(
         f"service-list-builder Version {version} - GPLv3\n",
     )
-
-    if not has_dependencies():
-        return 1
 
     if not ctypes.windll.shell32.IsUserAnAdmin():
         logger.error("administrator privileges required")

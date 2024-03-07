@@ -278,7 +278,7 @@ def main() -> int:
                     lower_binary_path = lower_binary_path.replace(starts_with, replacement)
 
             if not os.path.exists(lower_binary_path):
-                logger.error("unable to get path for %s", service_name)
+                print(f"unable to get binary path for {service_name}")
                 unknown_company_service_count += 1
                 continue
 
@@ -292,7 +292,7 @@ def main() -> int:
                     print(f'"{service_name}" is not a Windows service')
                     non_microsoft_service_count += 1
             except pywintypes.error:
-                logger.error('unable to get CompanyName for "%s"', service_name)
+                print(f"unable to get CompanyName for {service_name}")
                 unknown_company_service_count += 1
 
         if non_microsoft_service_count + unknown_company_service_count != 0:

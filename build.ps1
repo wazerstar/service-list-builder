@@ -17,10 +17,10 @@ function main() {
     $entryPoint = "..\..\service_list_builder\main.py"
 
     # create folder structure
-    New-Item -ItemType Directory -Path ".\build\service-list-builder\"
+    mkdir ".\build\service-list-builder\"
 
     # pack executable
-    New-Item -ItemType Directory -Path ".\build\pyinstaller\"
+    mkdir ".\build\pyinstaller\"
     Push-Location ".\build\pyinstaller\"
     pyinstaller $entryPoint --onefile --name service-list-builder
     Pop-Location

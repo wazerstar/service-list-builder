@@ -11,13 +11,7 @@ function main() {
     # Setup NSudo
     # =============
     git clone $urls["NSudo"] ".\tmp\NSudo\"
-    Push-Location ".\tmp\NSudo\"
-
-    # build NSudo
-    MSBuild.exe ".\Source\Native\NSudo.sln" -p:Configuration=Release -p:Platform=x64
-
-    Pop-Location
-
+    MSBuild.exe ".\tmp\NSudo\Source\Native\NSudo.sln" -p:Configuration=Release -p:Platform=x64
     Copy-Item ".\tmp\NSudo\Source\Native\Output\Binaries\Release\x64\NSudoLG.exe" ".\service_list_builder\"
 
     return 0

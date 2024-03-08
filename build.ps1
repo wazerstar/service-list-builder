@@ -28,7 +28,8 @@ function main() {
     # create final package
     Copy-Item ".\build\pyinstaller\dist\service-list-builder.exe" ".\build\service-list-builder\"
     Copy-Item ".\service_list_builder\lists.ini" ".\build\service-list-builder\"
-
+    Copy-Item ".\service_list_builder\NSudoLG.exe" ".\build\service-list-builder\"
+    
     return 0
 }
 

@@ -10,7 +10,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
 
 - Download the latest release from the [releases tab](https://github.com/amitxv/service-list-builder/releases)
 
-- Open **lists.ini** in a text editor
+- Open ``lists.ini`` in a text editor
 
     - Every user-mode service **NOT** specified in the ``[enabled_services]`` section will get disabled. This section acts as whitelist of user-mode services **NOT** to disable
 
@@ -24,7 +24,7 @@ I am not responsible for damage caused to computer. This tool is powerful and fo
   service-list-builder --config lists.ini
   ```
 
-- The scripts will be built in the **build** folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with ``Enable All Privileges`` option enabled to prevent errors when writing to registry and renaming files. It is included in the release
+- The scripts will be built in the ``build`` folder. [NSudo](https://github.com/M2Team/NSudo) is required to run the scripts with ``Enable All Privileges`` option enabled to prevent errors when writing to registry and renaming files. It is included in the release
 
 <!-- ## Example
 

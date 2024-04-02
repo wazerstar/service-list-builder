@@ -66,7 +66,7 @@ As a short-term and temporary solution, you can simply run ``Services-Enable.bat
 
 5. In the ``Services-Enable.bat`` script, copy all the lines from the start of the script until and including the ``reg query`` command into the ``Debug-Services.bat`` script. The lines that rename binaries (if you have any) must also be copied. These lines begin with ``REN``
 
-6. If you have any lines that change the ``LowerFilters`` and/or ``UpperFilters`` registry keys, you will need to handle those first, otherwise, you can continue to step 6 if you don't have any. Copy those lines and the line that changes the ``Start`` value for each driver inside the filter to the ``Debug-Services.bat`` script. The null terminator character (``\0``) is not part of the driver name (e.g. ``\0iorate`` is ``iorate``).
+6. If you have any lines that change the ``LowerFilters`` and/or ``UpperFilters`` registry keys, you will need to handle those first, otherwise, you can continue to step 7 if you don't have any. Copy those lines and the line that changes the ``Start`` value for each driver inside the filter to the ``Debug-Services.bat`` script. The null terminator character (``\0``) is not part of the driver name (e.g. ``\0iorate`` is ``iorate``).
 
     <details>
 
@@ -97,9 +97,9 @@ As a short-term and temporary solution, you can simply run ``Services-Enable.bat
 
 8. Run the ``Debug-Services.bat`` script with NSudo and restart your PC
 
-9. Test the functionality. If it is **NOT** working then return to step 6, otherwise, continue to step 9
+9. Test the functionality. If it is **NOT** working then return to step 7, otherwise, continue to step 10
 
-10. Disable the last 10 services in the ``Debug-Services.bat`` individually by changing the start value to 4 then restart your PC. Keep repeating until the functionality breaks again. When it breaks, continue to step 10
+10. Disable the last 10 services in the ``Debug-Services.bat`` individually by changing the start value to 4 then restart your PC. Keep repeating until the functionality breaks again. When it breaks, continue to step 11
 
 11. Now that you have identified which service breaks the functionality, try to re-enable it. If you can reproduce the functionality breaking while the service is disabled and works with it enabled a few times, then make a note of this service in ``dependencies.txt`` and continue to the next step
 
@@ -111,6 +111,6 @@ As a short-term and temporary solution, you can simply run ``Services-Enable.bat
     service-list-builder.exe --kernel-mode --get-dependencies <service>
     ```
 
-14. For each service that you noted down in ``dependencies.txt``, get the default start value for it from the ``Services-Enable.bat`` script and change the start value for the service in the ``Services-Disable.bat`` script. Run the ``Services-Disable.bat`` script with NSudo to check whether the functionality is working. If it is not working, return to step 1 and repeat the entire process with the newly edited/latest ``Services-Disable.bat`` script, otherwise, continue to step 14. This is because a service that is required for the functionality might not have any service dependencies
+14. For each service that you noted down in ``dependencies.txt``, get the default start value for it from the ``Services-Enable.bat`` script and change the start value for the service in the ``Services-Disable.bat`` script. Run the ``Services-Disable.bat`` script with NSudo to check whether the functionality is working. If it is not working, return to step 1 and repeat the entire process with the newly edited/latest ``Services-Disable.bat`` script, otherwise, continue to step 15. This is because a service that is required for the functionality might not have any service dependencies
 
 15. At this stage, your functionality should be working after running the ``Services-Disable.bat`` script. Now you can update your ``lists.ini`` with everything that you noted in ``dependencies.txt`` for the future

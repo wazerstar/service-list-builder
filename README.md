@@ -1,10 +1,8 @@
 # service-list-builder
 
-[![Downloads](https://img.shields.io/github/downloads/amitxv/service-list-builder/total.svg)](https://github.com/amitxv/service-list-builder/releases)
+[![Downloads](https://img.shields.io/github/downloads/amitxv/service-list-builder/total.svg)](https://github.com/amitxv/service-list-builder/releases) [![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-orange?logo=buy-me-a-coffee)](https://www.buymeacoffee.com/amitxv)
 
 I am not responsible for damage caused to computer. This tool is powerful and for advanced users only. There is a risk of damaging your operating system if you disable core services that are required for Windows to function correctly. It is your responsibility to use suitable service configurations for your specific operating system. If you would like to re-build the scripts, ensure to run the generated ``Services-Enable.bat`` script beforehand as the tool relies on the current state of services for building future scripts.
-
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/amitxv)
 
 ## Usage and Program Logic
 
